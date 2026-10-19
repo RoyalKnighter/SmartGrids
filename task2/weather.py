@@ -47,6 +47,13 @@ PV_AZIMUTH_DEG = 0        # Ausrichtung (0° = Süd, -90° = Ost, 90° = West)
 
 DATA_DIR = Path("data")
 
+# Gesetzliche Feiertage NRW 2025. Wochen mit Feiertag werden bei der Auswahl übersprungen,
+# weil die repräsentative Lastwoche fünf Werktage annimmt.
+HOLIDAYS = pd.to_datetime([
+    "2025-01-01", "2025-04-18", "2025-04-21", "2025-05-01", "2025-05-29", "2025-06-09",
+    "2025-06-19", "2025-10-03", "2025-11-01", "2025-12-25", "2025-12-26",
+]).date
+
 
 # ---------------------------------------------------------------------------
 # Anlagendaten
@@ -215,14 +222,18 @@ def add_power(df, module=PV_MODULE, turbine=WIND_TURBINE):
 # 3. Auswahl typischer Wochen
 # ---------------------------------------------------------------------------
 
-def _week_candidates(df_local, month):
-    """Alle Montage, deren Woche (Mo 00:00 - So 23:00) vollständig im Monat liegt und 168 Stunden hat."""
+def _week_candidates(df_local, month, holidays=HOLIDAYS):
+    """
+    Alle Montage, deren Woche (Mo 00:00 - So 23:00) vollständig im Monat liegt,
+    168 Stunden hat (keine Zeitumstellung) und keinen Feiertag enthält.
+    """
     in_month = df_local[df_local.index.month == month.number]
     mondays = sorted({ts.normalize() for ts in in_month.index if ts.weekday() == 0})
     candidates = []
     for monday in mondays:
         week = df_local[(df_local.index >= monday) & (df_local.index < monday + pd.DateOffset(days=7))]
-        if len(week) == 168 and (week.index.month == month.number).all():
+        has_holiday = any(d in set(holidays) for d in week.index.date)
+        if len(week) == 168 and (week.index.month == month.number).all() and not has_holiday:
             candidates.append(monday)
     return candidates
 
@@ -321,27 +332,43 @@ def load_weather_weeks(path=None, year=YEAR):
 # Plots
 # ---------------------------------------------------------------------------
 
-def plot_power_curves(module=PV_MODULE, turbine=WIND_TURBINE):
-    """Kennlinien: PV-Leistung über Einstrahlung (für drei Temperaturen) und Windkennlinie."""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2))
+def plot_pv_curve(module=PV_MODULE, ax=None):
+    """PV-Kennlinie: AC-Leistung je Modul über der Einstrahlung für drei Lufttemperaturen."""
+    if ax is None:
+        _, ax = plt.subplots(figsize=(7, 4.2))
     g = np.linspace(0, 1100, 200)
     for t in [0, 15, 30]:
-        ax1.plot(g, pv_power(g, np.full_like(g, t), module), label=f"Lufttemperatur {t} °C")
-    ax1.set_title(f"PV-Modul: {module['name']}")
-    ax1.set_xlabel("Einstrahlung auf Modulebene G [W/m²]")
-    ax1.set_ylabel("AC-Leistung je Modul [W]")
-    ax1.grid(True, alpha=0.4)
-    ax1.legend()
+        ax.plot(g, pv_power(g, np.full_like(g, t), module), label=f"Lufttemperatur {t} °C")
+    ax.axhline(module["p_stc_w"], color="grey", ls="--", lw=1, label=f"P_STC = {module['p_stc_w']:.0f} W")
+    ax.set_title(f"PV-Modul: {module['name']}")
+    ax.set_xlabel("Einstrahlung auf Modulebene G [W/m²]")
+    ax.set_ylabel("AC-Leistung je Modul [W]")
+    ax.grid(True, alpha=0.4)
+    ax.legend()
+    return ax
 
+
+def plot_wind_curve(turbine=WIND_TURBINE, ax=None):
+    """Leistungskennlinie der Windenergieanlage."""
+    if ax is None:
+        _, ax = plt.subplots(figsize=(7, 4.2))
     v = np.linspace(0, 27, 541)
-    ax2.plot(v, wind_power(v, turbine), color="tab:green")
-    ax2.plot(list(turbine["power_curve"].keys())[:-1], list(turbine["power_curve"].values())[:-1],
-             "o", ms=3, color="tab:green", label="Stützstellen der Kennlinie")
-    ax2.set_title(f"Windenergieanlage: {turbine['name']}")
-    ax2.set_xlabel("Windgeschwindigkeit in Nabenhöhe [m/s]")
-    ax2.set_ylabel("Leistung [kW]")
-    ax2.grid(True, alpha=0.4)
-    ax2.legend()
+    ax.plot(v, wind_power(v, turbine), color="tab:green", label="Kennlinie (linear interpoliert)")
+    ax.plot(list(turbine["power_curve"].keys())[:-1], list(turbine["power_curve"].values())[:-1],
+            "o", ms=3, color="tab:green", label="Stützstellen")
+    ax.set_title(f"Windenergieanlage: {turbine['name']}")
+    ax.set_xlabel("Windgeschwindigkeit in Nabenhöhe [m/s]")
+    ax.set_ylabel("Leistung [kW]")
+    ax.grid(True, alpha=0.4)
+    ax.legend()
+    return ax
+
+
+def plot_power_curves(module=PV_MODULE, turbine=WIND_TURBINE):
+    """Beide Kennlinien nebeneinander."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.2))
+    plot_pv_curve(module, ax1)
+    plot_wind_curve(turbine, ax2)
     fig.tight_layout()
     return fig
 

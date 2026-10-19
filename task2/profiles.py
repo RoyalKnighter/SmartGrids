@@ -16,6 +16,10 @@ Umrechnung
 ----------
 Mittlere Leistung einer Viertelstunde:  P [kW] = E [kWh] / 0,25 h = 4 * E
 Skalierung auf einen Jahresverbrauch:  P = P_norm * Jahresverbrauch / 1.000.000 kWh
+Dynamisierung (H25 ist "entdynamisiert"): P_dyn = P * F(t), t = Tag des Jahres
+    F(t) = -3,92e-10 t^4 + 3,2e-7 t^3 - 7,02e-5 t^2 + 2,1e-3 t + 1,24
+    (BDEW, Anwendungshilfe SLP 2025, S. 3-4; Polynom aus BDEW "Anwendung der
+     repräsentativen VDEW-Lastprofile step-by-step", S. 18 f.)
 """
 
 from enum import Enum
@@ -33,7 +37,6 @@ import matplotlib.pyplot as plt
 class Lastprofil(Enum):
     """Verfügbare Profile. Der Wert ist (Dateiname, Beschreibung)."""
     HAUSHALT = ("BDEW_H25_Haushalte.csv", "H25 – Haushalt")
-    PV = ("BDEW_P25_PV.csv", "P25 – Haushalt mit PV-Anlage (Netzbezug)")
 
     @property
     def filename(self):
@@ -136,7 +139,7 @@ def read_bdew_csv(path):
 def load_profiles(data_dir="data", profiles=tuple(Lastprofil)):
     """
     Liest alle Profile einmal ein und gibt sie als Dictionary zurück:
-        {Lastprofil.HAUSHALT: DataFrame, Lastprofil.PV: DataFrame}
+        {Lastprofil.HAUSHALT: DataFrame}
     """
     data_dir = Path(data_dir)
     return {p: read_bdew_csv(data_dir / p.filename) for p in profiles}
@@ -145,6 +148,19 @@ def load_profiles(data_dir="data", profiles=tuple(Lastprofil)):
 # ---------------------------------------------------------------------------
 # Aufbereitung
 # ---------------------------------------------------------------------------
+
+# Profile, auf die die Dynamisierungsfunktion anzuwenden ist
+DYNAMIC_PROFILES = {Lastprofil.HAUSHALT}
+
+
+def dynamization_factor(day_of_year):
+    """
+    BDEW-Dynamisierungsfaktor F(t) für den Tag des Jahres t (1 ... 366),
+    gerundet auf vier Nachkommastellen (Empfehlung BDEW).
+    """
+    t = np.asarray(day_of_year, dtype=float)
+    f = -3.92e-10 * t**4 + 3.2e-7 * t**3 - 7.02e-5 * t**2 + 2.1e-3 * t + 1.24
+    return np.round(f, 4)
 
 def get_day(profiles, profil, month, daytype, annual_kwh=NORM_KWH, unit="kW"):
     """
@@ -159,7 +175,7 @@ def get_day(profiles, profil, month, daytype, annual_kwh=NORM_KWH, unit="kW"):
 
 
 def build_week(profiles, profil, month, annual_kwh=NORM_KWH, unit="kW", year=2025,
-               start=None, resolution="15min"):
+               start=None, resolution="15min", dynamize=True):
     """
     Erzeugt eine repräsentative Woche für einen Monat:
     5 x Werktag (Mo-Fr), 1 x Samstag, 1 x Sonntag/Feiertag.
@@ -168,6 +184,8 @@ def build_week(profiles, profil, month, annual_kwh=NORM_KWH, unit="kW", year=202
                  typischen Wetterwoche). Ohne Angabe: erster Montag des Monats in `year`.
     resolution : "15min" (Originalauflösung, 672 Werte) oder "1h" (Stundenmittelwerte,
                  168 Werte; Zeitstempel = Beginn der Stunde).
+    dynamize   : Dynamisierungsfunktion anwenden (für H25 vorgeschrieben). Der Faktor
+                 wird je Kalendertag aus dem Tag des Jahres berechnet.
 
     Rückgabe
     --------
@@ -185,6 +203,8 @@ def build_week(profiles, profil, month, annual_kwh=NORM_KWH, unit="kW", year=202
     index = pd.date_range(start.normalize(), periods=7 * 96, freq="15min")
 
     values = pd.Series(np.concatenate(days), index=index, name=f"{profil.label} [{unit}]")
+    if dynamize and profil in DYNAMIC_PROFILES:
+        values = values * dynamization_factor(values.index.dayofyear)
     if resolution == "1h":
         values = values.resample("1h").mean()      # Mittel der vier Viertelstunden-Leistungen
     elif resolution != "15min":
@@ -193,14 +213,15 @@ def build_week(profiles, profil, month, annual_kwh=NORM_KWH, unit="kW", year=202
 
 
 def build_weeks(profiles, profil, months=tuple(Month), annual_kwh=NORM_KWH, unit="kW", year=2025,
-                starts=None, resolution="15min"):
+                starts=None, resolution="15min", dynamize=True):
     """
     Repräsentative Wochen für mehrere Monate: {Month: Series}.
     starts: optionales Dictionary {Month: Montag}, z. B. aus weather.select_typical_weeks
             bzw. aus den Zeitstempeln der Wetterwochen.
     """
     return {m: build_week(profiles, profil, m, annual_kwh, unit, year,
-                          start=None if starts is None else starts[m], resolution=resolution)
+                          start=None if starts is None else starts[m], resolution=resolution,
+                          dynamize=dynamize)
             for m in months}
 
 
@@ -233,17 +254,20 @@ def _week_axis(ax):
 
 
 def plot_week(profiles, profil, months=(Month.JANUARY, Month.APRIL, Month.JULY, Month.OCTOBER),
-              annual_kwh=NORM_KWH, unit="kW", ax=None):
-    """Repräsentative Wochen mehrerer Monate eines Profils in einem Diagramm."""
+              annual_kwh=NORM_KWH, unit="kW", ax=None, starts=None, resolution="15min", dynamize=True):
+    """Repräsentative Wochen mehrerer Monate eines Profils in einem Diagramm (dynamisiert)."""
     if ax is None:
         _, ax = plt.subplots(figsize=(12, 4.5))
     for month in months:
-        week = build_week(profiles, profil, month, annual_kwh, unit)
+        week = build_week(profiles, profil, month, annual_kwh, unit,
+                          start=None if starts is None else starts[month],
+                          resolution=resolution, dynamize=dynamize)
         hours = (week.index - week.index[0]) / pd.Timedelta(hours=1)
         ax.plot(hours, week.to_numpy(), label=month.label, linewidth=1.2)
     _week_axis(ax)
     scale = "normiert auf 1 Mio. kWh/a" if annual_kwh == NORM_KWH else f"Jahresverbrauch {annual_kwh:,.0f} kWh/a".replace(",", ".")
-    ax.set_title(f"{profil.label} – repräsentative Woche je Monat ({scale})")
+    dyn = "dynamisiert" if dynamize and profil in DYNAMIC_PROFILES else "ohne Dynamisierung"
+    ax.set_title(f"{profil.label} – repräsentative Woche je Monat ({scale}, {dyn})")
     ax.set_ylabel(f"Mittlere Leistung [{unit}]")
     ax.legend(title="Monat", loc="upper left", bbox_to_anchor=(1.01, 1))
     return ax
@@ -259,25 +283,10 @@ def plot_day(profiles, profil, month, annual_kwh=NORM_KWH, unit="kW", ax=None):
     ax.set_xticks(range(0, 25, 3))
     ax.set_xlim(0, 24)
     ax.grid(True, alpha=0.4)
-    ax.set_title(f"{profil.label} – {month.label}")
+    ax.set_title(f"{profil.label} – {month.label} (ohne Dynamisierung)")
     ax.set_xlabel("Uhrzeit [h]")
     ax.set_ylabel(f"Mittlere Leistung [{unit}]")
     ax.legend(title="Tagtyp")
-    return ax
-
-
-def plot_compare(profiles, profile_list, month, annual_kwh=NORM_KWH, unit="kW", ax=None):
-    """Mehrere Profile für denselben Monat (repräsentative Woche) vergleichen."""
-    if ax is None:
-        _, ax = plt.subplots(figsize=(12, 4.5))
-    for profil in profile_list:
-        week = build_week(profiles, profil, month, annual_kwh, unit)
-        hours = (week.index - week.index[0]) / pd.Timedelta(hours=1)
-        ax.plot(hours, week.to_numpy(), label=profil.label, linewidth=1.2)
-    _week_axis(ax)
-    ax.set_title(f"Profilvergleich – repräsentative Woche {month.label}")
-    ax.set_ylabel(f"Mittlere Leistung [{unit}]")
-    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     return ax
 
 
@@ -297,6 +306,6 @@ def plot_seasons(profiles, profil, daytype=DayType.WT, annual_kwh=NORM_KWH, unit
         ax.set_xlabel("Uhrzeit [h]")
     for ax in axes[:, 0]:
         ax.set_ylabel(f"Mittlere Leistung [{unit}]")
-    fig.suptitle(f"{profil.label} – {daytype.value} nach Jahreszeit")
+    fig.suptitle(f"{profil.label} – {daytype.value} nach Jahreszeit (ohne Dynamisierung)")
     fig.tight_layout()
     return fig
