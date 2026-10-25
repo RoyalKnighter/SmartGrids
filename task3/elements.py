@@ -22,18 +22,27 @@ class Profile(Enum):
     """Zeitverlauf einer Last oder eines Erzeugers."""
     HAUSHALT = "Haushalt (BDEW H25)"
     GEWERBE = "Gewerbe (BDEW G25)"
+    LANDWIRTSCHAFT = "Landwirtschaft (BDEW L25)"
+    HAUSHALT_PV = "Haushalt mit PV, Netzbezug (BDEW P25)"
+    HAUSHALT_PV_SPEICHER = "Haushalt mit PV und Speicher, Netzbezug (BDEW S25)"
     PV = "Photovoltaik (Wetter, Trina Vertex S+)"
     WIND = "Wind (Wetter, Vestas V90-2.0 MW)"
     FEST = "konstante Leistung"
 
 
+# Lastprofile, die über einen Jahresverbrauch (annual_kwh) skaliert werden
+ENERGY_PROFILES = {Profile.HAUSHALT, Profile.GEWERBE, Profile.LANDWIRTSCHAFT,
+                   Profile.HAUSHALT_PV, Profile.HAUSHALT_PV_SPEICHER}
+ENERGY_PROFILE_NAMES = {p.name for p in ENERGY_PROFILES}
+
 # Welche Profile sind für welche Elementtabelle zulässig
-LOAD_PROFILES = {Profile.HAUSHALT, Profile.GEWERBE, Profile.FEST}
+LOAD_PROFILES = ENERGY_PROFILES | {Profile.FEST}
 SGEN_PROFILES = {Profile.PV, Profile.WIND, Profile.FEST}
 
 # Standard-Leistungsfaktoren
-DEFAULT_COS_PHI = {Profile.HAUSHALT: 0.97, Profile.GEWERBE: 0.95, Profile.PV: 1.0,
-                   Profile.WIND: 1.0, Profile.FEST: None}
+DEFAULT_COS_PHI = {Profile.HAUSHALT: 0.97, Profile.GEWERBE: 0.95, Profile.LANDWIRTSCHAFT: 0.95,
+                   Profile.HAUSHALT_PV: 0.97, Profile.HAUSHALT_PV_SPEICHER: 0.97,
+                   Profile.PV: 1.0, Profile.WIND: 1.0, Profile.FEST: None}
 
 
 class Diagram(Enum):
@@ -128,7 +137,8 @@ class Switch:
 class Load:
     """
     Last mit Profil.
-    HAUSHALT/GEWERBE: annual_kwh angeben, oder p_mw als Jahreshöchstleistung
+    HAUSHALT, GEWERBE, LANDWIRTSCHAFT, HAUSHALT_PV, HAUSHALT_PV_SPEICHER:
+                      annual_kwh angeben, oder p_mw als Jahreshöchstleistung
                       (annual_kwh wird dann daraus berechnet)
     FEST:             p_mw (und q_mvar oder cos_phi)
     """

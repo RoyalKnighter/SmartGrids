@@ -35,7 +35,7 @@ import pandapower.toolbox as tb
 import diagrams
 import timeseries as tsm
 from elements import (Profile, Diagram, Bus, Line, Trafo, ExtGrid, Switch, Load, Generator,
-                      LOAD_PROFILES, SGEN_PROFILES, DEFAULT_COS_PHI)
+                      LOAD_PROFILES, SGEN_PROFILES, DEFAULT_COS_PHI, ENERGY_PROFILES, ENERGY_PROFILE_NAMES)
 from profiles import Month
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -363,12 +363,12 @@ class Simulation:
 
         if cos_phi is None:
             cos_phi = df.at[idx, "cos_phi"] if "cos_phi" in df and not pd.isna(df.at[idx, "cos_phi"]) else None
-        if cos_phi is None and profile in (Profile.HAUSHALT, Profile.GEWERBE) and old_p > 0 and old_q != 0:
+        if cos_phi is None and profile in ENERGY_PROFILES and old_p > 0 and old_q != 0:
             cos_phi = old_p / np.hypot(old_p, old_q)          # Leistungsfaktor des Netzmodells beibehalten
         if cos_phi is None:
             cos_phi = DEFAULT_COS_PHI[profile]
 
-        if profile in (Profile.HAUSHALT, Profile.GEWERBE):
+        if profile in ENERGY_PROFILES:
             if annual_kwh is None:
                 annual_kwh = df.at[idx, "annual_kwh"] if (p_mw is None and not pd.isna(df.at[idx, "annual_kwh"])) \
                     else tsm.annual_kwh_from_peak(profile, p_ref)
@@ -388,7 +388,7 @@ class Simulation:
         else:
             df.at[idx, "cos_phi"] = float(cos_phi)
             df.at[idx, "q_mvar"] = df.at[idx, "p_mw"] * np.tan(np.arccos(float(cos_phi)))
-        if table == "load" and profile not in (Profile.HAUSHALT, Profile.GEWERBE):
+        if table == "load" and profile not in ENERGY_PROFILES:
             df.at[idx, "annual_kwh"] = np.nan
         if table == "sgen" and profile != Profile.PV:
             df.at[idx, "kwp"] = np.nan
@@ -729,7 +729,7 @@ class Simulation:
                 prof, scale = "", ""
                 if t in PROFILE_COLUMNS:
                     prof = r["profile"]
-                    if prof in ("HAUSHALT", "GEWERBE"):
+                    if prof in ENERGY_PROFILE_NAMES:
                         scale = f"{r['annual_kwh']:,.0f} kWh/a".replace(",", ".")
                     elif prof == "PV":
                         scale = f"{r['kwp']:,.1f} kWp".replace(",", ".")
@@ -818,7 +818,7 @@ class Simulation:
             df = self.net[t]
             for idx, r in df.iterrows():
                 prof = r["profile"]
-                if prof in ("HAUSHALT", "GEWERBE") and pd.isna(r["annual_kwh"]):
+                if prof in ENERGY_PROFILE_NAMES and pd.isna(r["annual_kwh"]):
                     problems.append(f"{r['name']}: Jahresverbrauch fehlt")
                 if prof == "PV" and pd.isna(r["kwp"]):
                     problems.append(f"{r['name']}: kWp fehlt")
@@ -836,7 +836,7 @@ class Simulation:
         if not len(df):
             return df.index.to_numpy(), np.zeros((len(profile_table), 0)), np.zeros((len(profile_table), 0))
         prof = df["profile"].to_numpy()
-        scale = np.where(np.isin(prof, ["HAUSHALT", "GEWERBE"]), df.get("annual_kwh", np.nan),
+        scale = np.where(np.isin(prof, list(ENERGY_PROFILE_NAMES)), df.get("annual_kwh", np.nan),
                          np.where(prof == "PV", df.get("kwp", np.nan), df["p_mw"])).astype(float)
         base = profile_table[list(prof)].to_numpy()                      # T × n normierte Werte
         p = base * scale
@@ -981,7 +981,7 @@ class Simulation:
         return self.results.summary(self.settings.get("v_min", 0.9), self.settings.get("v_max", 1.1), by=by)
 
     def createDiagram(self, diagram, elements=None, months=None, layout="week", time=None,
-                      title=None, limits=True, save=False, show=True):
+                      title=None, limits=True, save=False, show=True, markers=None):
         """
         Diagramm erzeugen.
 
@@ -994,9 +994,13 @@ class Simulation:
         time    : nur VOLTAGE_PROFILE: Zeitpunkt (Timestamp/str), "min" oder "max"
         save    : Diagramme als PNG im Simulationsordner (diagrams/) speichern
         show    : Diagramme anzeigen; mit show=False werden die Figures zurückgegeben
+        markers : Liste von Markierungen, je (farbe, wert, text), z. B.
+                  [("orange", 0.95, "Warnschwelle"), ("red", 1.05, "obere Grenze")]
+                  Zahl → waagerechte Linie; Zeitpunkt (z. B. "2025-07-23 13:00") → senkrechte Linie.
+                  Optional 4. Element: Linienstil ("-", "--", ":", "-.")
         """
         self._require_results()
         out_dir = (SIM_DIR / self.name / "diagrams") if save else None
         figs = diagrams.create(self, diagram, elements, months=months, layout=layout, time=time,
-                               title=title, limits=limits, out_dir=out_dir, show=show)
+                               title=title, limits=limits, out_dir=out_dir, show=show, markers=markers)
         return None if show else figs

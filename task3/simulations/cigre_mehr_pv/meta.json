@@ -1,10 +1,10 @@
 {
   "name": "cigre_mehr_pv",
   "meta": {
-    "created": "2026-10-21T14:45:43",
-    "modified": "2026-10-21T14:45:43",
+    "created": "2026-10-25T15:33:00",
+    "modified": "2026-10-25T15:33:00",
     "parent": "cigre_basis",
-    "last_run": "2026-10-21T14:46:37",
+    "last_run": "2026-10-25T15:34:46",
     "results_status": "aktuell"
   },
   "settings": {
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-10-21T14:45:43",
+      "zeit": "2026-10-25T15:33:00",
       "aktion": "Element hinzugefügt",
       "element": "PV-Park",
       "tabelle": "sgen",
@@ -56,7 +56,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-10-21T14:45:43",
+      "zeit": "2026-10-25T15:33:00",
       "aktion": "Parameter geändert",
       "element": "PV-Freifläche",
       "tabelle": "sgen",

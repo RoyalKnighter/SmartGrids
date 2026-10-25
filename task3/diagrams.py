@@ -199,6 +199,72 @@ def _limit_lines(ax, diagram, limits, sim_settings):
         ax.axhline(0, color="black", lw=0.8)
 
 
+def parse_markers(markers):
+    """
+    Markierungen vereinheitlichen. Jede Markierung ist
+        (farbe, wert, text)                 oder  {"color": ..., "value": ..., "text": ...}
+    Optional als 4. Element bzw. Schlüssel "style": Linienstil (Standard "-.").
+
+    wert = Zahl                     → waagerechte Linie (z. B. 0.95 pu, 80 %)
+    wert = Zeitpunkt (str/Timestamp) → senkrechte Linie (nur in Zeitdiagrammen)
+    """
+    if markers is None:
+        return []
+    if isinstance(markers, (tuple, dict)):
+        markers = [markers]
+    out = []
+    for m in markers:
+        if isinstance(m, dict):
+            color, value, text, style = m.get("color", "black"), m["value"], m.get("text", ""), m.get("style", "-.")
+        else:
+            if len(m) < 2:
+                raise ValueError("Markierung als (farbe, wert, text) angeben.")
+            color, value = m[0], m[1]
+            text = m[2] if len(m) > 2 else ""
+            style = m[3] if len(m) > 3 else "-."
+        if isinstance(value, (int, float, np.integer, np.floating)) and not isinstance(value, bool):
+            out.append({"kind": "h", "color": color, "value": float(value), "text": text, "style": style})
+        else:
+            try:
+                t = pd.Timestamp(value)
+            except (ValueError, TypeError):
+                raise ValueError(f"Wert der Markierung '{value}' ist weder Zahl noch Zeitpunkt.")
+            out.append({"kind": "v", "color": color, "value": t, "text": text, "style": style})
+    return out
+
+
+def _draw_markers(ax, markers, mode="time", index=None, month=None, info=None):
+    """
+    Markierungen zeichnen.
+    mode: "time" (x = Zeitstempel), "hour" (x = Stunde der Woche, Monat `month`),
+          "position" (x = laufende Nummer, Zeitstempel in `index`), "none" (nur waagerecht)
+    """
+    from matplotlib.transforms import blended_transform_factory
+    for m in markers:
+        if m["kind"] == "h":
+            ax.axhline(m["value"], color=m["color"], ls=m["style"], lw=1.4, zorder=3)
+            if m["text"]:
+                ax.text(0.995, m["value"], m["text"], color=m["color"], fontsize=8, ha="right", va="bottom",
+                        transform=blended_transform_factory(ax.transAxes, ax.transData), zorder=4,
+                        bbox=dict(facecolor="white", edgecolor="none", alpha=0.7, pad=1))
+            continue
+        t = m["value"]
+        x = None
+        if mode == "time" and index is not None and len(index) and index[0] <= t <= index[-1]:
+            x = t
+        elif mode == "hour" and info is not None and t in info.index and info.at[t, "month"] == month:
+            x = info.at[t, "hour_of_week"]
+        elif mode == "position" and index is not None and t in index:
+            x = index.get_loc(t)
+        if x is None:
+            continue
+        ax.axvline(x, color=m["color"], ls=m["style"], lw=1.4, zorder=3)
+        if m["text"]:
+            ax.text(x, 0.98, " " + m["text"], color=m["color"], fontsize=8, ha="left", va="top", rotation=90,
+                    transform=blended_transform_factory(ax.transData, ax.transAxes), zorder=4,
+                    bbox=dict(facecolor="white", edgecolor="none", alpha=0.7, pad=1))
+
+
 def _hour_axis(ax):
     """Achse für Stunde der Woche (0…168): 6-h-Teilung, Tageslinien, Wochentage."""
     ax.set_xlim(0, 168)
@@ -221,15 +287,16 @@ def _finish(fig, out_dir, filename, show):
 
 
 def create(sim, diagram, elements=None, months=None, layout="week", time=None, title=None,
-           limits=True, out_dir=None, show=True):
+           limits=True, out_dir=None, show=True, markers=None):
     """Diagramm(e) einer Simulation. Rückgabe: Liste der Figures."""
     res = sim.results
     if diagram == Diagram.VOLTAGE_PROFILE:
-        return [_voltage_profile(sim, elements, time, title, limits, out_dir, show)]
+        return [_voltage_profile(sim, elements, time, title, limits, out_dir, show, markers)]
     df, ylabel, _, kind = _source(res, diagram)
     cols = _select(df, elements, kind)
     months = _months(res, months)
     figs = []
+    markers = parse_markers(markers)
     label = title or f"{diagram.value} – Simulation '{sim.name}'"
 
     if layout == "week":
@@ -239,6 +306,7 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
             for c in cols:
                 ax.plot(idx, df.loc[idx, c], lw=1.3, label=c)
             _limit_lines(ax, diagram, limits, sim.settings)
+            _draw_markers(ax, markers, "time", index=idx)
             plots.week_axis(ax, idx)
             ax.set_ylabel(ylabel)
             ax.set_xlabel("Uhrzeit [h]")
@@ -257,6 +325,9 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
                     ax.plot(res.info.loc[sel, "hour_of_week"], df.loc[sel, c], lw=1.2,
                             label=f"{m.label} – {c}" if len(cols) > 1 else m.label)
             _limit_lines(ax, diagram, limits, sim.settings)
+            for m in [m for m in s.months if m in months]:
+                _draw_markers(ax, [k for k in markers if k["kind"] == "v"], "hour", month=m.name, info=res.info)
+            _draw_markers(ax, [k for k in markers if k["kind"] == "h"], "none")
             _hour_axis(ax)
             ax.set_ylabel(ylabel)
             ax.set_title(s.label, pad=16)
@@ -274,6 +345,7 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
         for c in cols:
             ax.plot(x, sub[c].to_numpy(), lw=0.9, label=c)
         _limit_lines(ax, diagram, limits, sim.settings)
+        _draw_markers(ax, markers, "position", index=info.index)
         starts = np.flatnonzero(info["hour_of_week"].to_numpy() == 0)
         for s0 in starts:
             ax.axvline(s0, color="black", lw=1, alpha=0.7)
@@ -304,6 +376,7 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
                 box.set_alpha(0.6)
             ax.plot([], [], "s", color=color, alpha=0.6, label=c)
         _limit_lines(ax, diagram, limits, sim.settings)
+        _draw_markers(ax, markers, "none")
         ax.set_xticks(range(len(months)))
         ax.set_xticklabels([m.label for m in months], rotation=45)
         ax.set_ylabel(ylabel)
@@ -317,7 +390,7 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
     return figs
 
 
-def _voltage_profile(sim, buses, time, title, limits, out_dir, show):
+def _voltage_profile(sim, buses, time, title, limits, out_dir, show, markers=None):
     """Spannung entlang eines Pfades (Busse in Reihenfolge) zu einem Zeitpunkt."""
     res, net = sim.results, sim.net
     if not buses or len(buses) < 2:
@@ -345,6 +418,7 @@ def _voltage_profile(sim, buses, time, title, limits, out_dir, show):
     for d, c, v in zip(dist, cols, vm.loc[t]):
         ax.annotate(c, (d, v), xytext=(0, 7), textcoords="offset points", ha="center", fontsize=8)
     _limit_lines(ax, Diagram.VOLTAGE_PROFILE, limits, sim.settings)
+    _draw_markers(ax, parse_markers(markers), "none")
     ax.set_xlabel("Leitungslänge entlang des Pfades [km]")
     ax.set_ylabel("Spannung [pu]")
     ax.set_title(title or f"Spannungsverlauf – Simulation '{sim.name}' – {pd.Timestamp(t):%a %d.%m.%Y %H:%M}")
@@ -353,13 +427,15 @@ def _voltage_profile(sim, buses, time, title, limits, out_dir, show):
     return fig
 
 
-def compare(simulations, diagram, elements, months=None, layout="week", title=None, limits=True, show=True):
+def compare(simulations, diagram, elements, months=None, layout="week", title=None, limits=True, show=True,
+            markers=None):
     """Dieselbe Größe mehrerer Simulationen in einem Diagramm (layout "week" oder "overview")."""
     base = simulations[0]
     df0, ylabel, _, kind = _source(base.results, diagram)
     cols = _select(df0, elements, kind)
     months = _months(base.results, months)
     figs = []
+    markers = parse_markers(markers)
     styles = ["-", "--", ":", "-."]
     if layout == "week":
         for m in months:
@@ -372,6 +448,7 @@ def compare(simulations, diagram, elements, months=None, layout="week", title=No
                 for c in _select(df, cols, kind):
                     ax.plot(sel, df.loc[sel, c], ls=styles[k % 4], lw=1.3, label=f"{s.name}: {c}")
             _limit_lines(ax, diagram, limits, base.settings)
+            _draw_markers(ax, markers, "time", index=idx)
             plots.week_axis(ax, idx)
             ax.set_ylabel(ylabel)
             ax.set_xlabel("Uhrzeit [h]")
@@ -389,6 +466,7 @@ def compare(simulations, diagram, elements, months=None, layout="week", title=No
                         label=f"{s.name}: {c}")
         _limit_lines(ax, diagram, limits, base.settings)
         info = base.results.info[base.results.info["month"].isin([m.name for m in months])]
+        _draw_markers(ax, markers, "position", index=info.index)
         starts = np.flatnonzero(info["hour_of_week"].to_numpy() == 0)
         for s0 in starts:
             ax.axvline(s0, color="black", lw=1, alpha=0.7)

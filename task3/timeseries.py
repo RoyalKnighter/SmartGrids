@@ -5,7 +5,8 @@ Für jede simulierte Woche (je Monat eine typische Wetterwoche, stündlich) wird
 mit einer Spalte je Profil erzeugt. Die Werte sind normiert und werden in der Simulation mit
 der Skalierung des jeweiligen Elements multipliziert:
 
-    HAUSHALT, GEWERBE:  MW je kWh Jahresverbrauch    → × annual_kwh
+    HAUSHALT, GEWERBE, LANDWIRTSCHAFT,
+    HAUSHALT_PV, HAUSHALT_PV_SPEICHER:  MW je kWh Jahresverbrauch    → × annual_kwh
     PV:                 MW je kWp                    → × kwp
     WIND:               Leistung / Nennleistung      → × p_mw (Nennleistung)
     FEST:               1                            → × p_mw
@@ -26,13 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 WEATHER_FILE = DATA_DIR / "weather_weeks_2025.csv"
 
-_LOAD_PROFILE = {Profile.HAUSHALT: Lastprofil.HAUSHALT, Profile.GEWERBE: Lastprofil.GEWERBE}
+_LOAD_PROFILE = {Profile.HAUSHALT: Lastprofil.HAUSHALT, Profile.GEWERBE: Lastprofil.GEWERBE,
+                 Profile.LANDWIRTSCHAFT: Lastprofil.LANDWIRTSCHAFT, Profile.HAUSHALT_PV: Lastprofil.HAUSHALT_PV,
+                 Profile.HAUSHALT_PV_SPEICHER: Lastprofil.HAUSHALT_PV_SPEICHER}
 
 
 @lru_cache(maxsize=1)
 def load_inputs(data_dir=str(DATA_DIR), weather_file=str(WEATHER_FILE)):
     """Lastprofile und Wetterwochen (einmal je Sitzung eingelesen)."""
-    profiles = pr.load_profiles(Path(data_dir), profiles=(Lastprofil.HAUSHALT, Lastprofil.GEWERBE))
+    profiles = pr.load_profiles(Path(data_dir), profiles=tuple(_LOAD_PROFILE.values()))
     weather = wt.load_weather_weeks(Path(weather_file))
     return profiles, weather
 
@@ -42,7 +45,7 @@ def build_profile_table(months=None, weather_file=str(WEATHER_FILE)):
     Normierte Zeitreihen aller Profile für die gewählten Monate.
 
     Rückgabe: DataFrame, Index = Zeitstempel (Beginn der Stunde, lokale Zeit), Spalten:
-        month, hour_of_week, HAUSHALT, GEWERBE, PV, WIND, FEST
+        month, hour_of_week, je Lastprofil eine Spalte, PV, WIND, FEST
     """
     profiles, weather = load_inputs(weather_file=weather_file)
     months = list(Month) if months is None else [months] if isinstance(months, Month) else list(months)
@@ -63,10 +66,10 @@ def build_profile_table(months=None, weather_file=str(WEATHER_FILE)):
     return pd.concat(parts)
 
 
-@lru_cache(maxsize=4)
+@lru_cache(maxsize=8)
 def annual_peak_mw_per_kwh(profile, year=2025):
     """
-    Höchste Stundenleistung eines Jahres in MW je kWh Jahresverbrauch (Haushalt, Gewerbe).
+    Höchste Stundenleistung eines Jahres in MW je kWh Jahresverbrauch (alle BDEW-Lastprofile).
     Wird verwendet, um aus einer Höchstleistung (z. B. p_mw im CIGRE-Netz) den
     Jahresverbrauch zu berechnen: annual_kwh = p_max_mw / annual_peak_mw_per_kwh.
 

@@ -38,6 +38,9 @@ class Lastprofil(Enum):
     """Verfügbare Profile. Der Wert ist (Dateiname, Beschreibung)."""
     HAUSHALT = ("BDEW_H25_Haushalte.csv", "H25 – Haushalt")
     GEWERBE = ("BDEW_G25_Gewerbe.csv", "G25 – Gewerbe allgemein")
+    LANDWIRTSCHAFT = ("BDEW_L25_Landwirtschaft.csv", "L25 – Landwirtschaft")
+    HAUSHALT_PV = ("BDEW_P25_PV.csv", "P25 – Haushalt mit PV (Netzbezug)")
+    HAUSHALT_PV_SPEICHER = ("BDEW_S25_PV_Speicher.csv", "S25 – Haushalt mit PV und Speicher (Netzbezug)")
 
     @property
     def filename(self):
@@ -120,9 +123,10 @@ def read_bdew_csv(path):
     """
     raw = pd.read_csv(path, sep=";", decimal=",", encoding="cp1252",
                       header=[2, 3], index_col=1, nrows=96)
-    raw = raw.drop(columns=raw.columns[0])            # leere erste Spalte
-
     month_by_label = {m.label: m for m in Month}
+    # nur Spalten mit Monat und Tagtyp behalten (erste Spalte und leere Zusatzspalten entfallen)
+    raw = raw[[c for c in raw.columns if c[0] in month_by_label and c[1] in DayType.__members__]]
+
     raw.columns = pd.MultiIndex.from_tuples(
         [(month_by_label[month], DayType[daytype]) for month, daytype in raw.columns],
         names=["month", "daytype"],
@@ -140,7 +144,7 @@ def read_bdew_csv(path):
 def load_profiles(data_dir="data", profiles=tuple(Lastprofil)):
     """
     Liest alle Profile einmal ein und gibt sie als Dictionary zurück:
-        {Lastprofil.HAUSHALT: DataFrame, Lastprofil.GEWERBE: DataFrame}
+        {Lastprofil.HAUSHALT: DataFrame, Lastprofil.GEWERBE: DataFrame, ...}
     """
     data_dir = Path(data_dir)
     return {p: read_bdew_csv(data_dir / p.filename) for p in profiles}
@@ -151,8 +155,8 @@ def load_profiles(data_dir="data", profiles=tuple(Lastprofil)):
 # ---------------------------------------------------------------------------
 
 # Profile, auf die die Dynamisierungsfunktion anzuwenden ist
-# (H25: ja; G25: nein, laut Dateikopf und BDEW-Anwendungshilfe 2025)
-DYNAMIC_PROFILES = {Lastprofil.HAUSHALT}
+# (H25, P25, S25: ja; G25, L25: nein – laut Dateikopf und BDEW-Anwendungshilfe 2025)
+DYNAMIC_PROFILES = {Lastprofil.HAUSHALT, Lastprofil.HAUSHALT_PV, Lastprofil.HAUSHALT_PV_SPEICHER}
 
 
 def dynamization_factor(day_of_year):

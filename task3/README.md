@@ -37,7 +37,7 @@ sim1 = sim.loadSimulation("cigre_basis")
 | `elements.py` | Elementklassen (`Bus`, `Line`, `Trafo`, `ExtGrid`, `Switch`, `Load`, `Generator`) und Enums `Profile`, `Diagram` |
 | `timeseries.py` | normierte Zeitreihen je Profil, Skalierung über die Jahreshöchstleistung |
 | `diagrams.py` | Klasse `Results` (Ergebnisse, Kennzahlen, Speichern/Laden) und alle Diagramme |
-| `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25) und Wetter/PV/Wind (aus Task 2) |
+| `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25, L25, P25, S25) und Wetter/PV/Wind (aus Task 2) |
 | `plots.py` | Zeitachse der Diagramme (6-h-Takt, Tageslinien, Datum) |
 | `data/` | BDEW-Profile und Wetterwochen |
 | `simulations/` | gespeicherte Simulationen (wird automatisch angelegt) |
@@ -52,15 +52,22 @@ Jede Last und jeder Erzeuger hat ein Profil. Es bestimmt den Leistungsverlauf ü
 |---|---|---|---|
 | `HAUSHALT` | `Load` | `annual_kwh` | BDEW H25 (dynamisiert) × Jahresverbrauch |
 | `GEWERBE` | `Load` | `annual_kwh` | BDEW G25 × Jahresverbrauch |
+| `LANDWIRTSCHAFT` | `Load` | `annual_kwh` | BDEW L25 × Jahresverbrauch |
+| `HAUSHALT_PV` | `Load` | `annual_kwh` | BDEW P25 (dynamisiert): **Netzbezug** eines Haushalts mit PV × Jahresverbrauch |
+| `HAUSHALT_PV_SPEICHER` | `Load` | `annual_kwh` | BDEW S25 (dynamisiert): **Netzbezug** eines Haushalts mit PV und Speicher × Jahresverbrauch |
 | `PV` | `Generator` | `kwp` | PV-Leistung je kWp aus den Wetterdaten × kWp |
 | `WIND` | `Generator` | `p_mw` (Nennleistung) | normierte V90-Kennlinie aus den Wetterdaten × Nennleistung |
 | `FEST` | `Load`, `Generator` | `p_mw` | konstant |
+
+**Dynamisierung:** H25, P25 und S25 werden dynamisiert, G25 und L25 nicht (so steht es im jeweiligen Dateikopf).
+
+**P25 und S25 sind Bezugsprofile:** Sie beschreiben, was ein Haushalt mit eigener PV-Anlage (und Speicher) **aus dem Netz bezieht**, nachdem der Eigenverbrauch abgezogen ist. Eine Einspeisung ins Netz ist darin nicht enthalten. Für Untersuchungen zu Rückspeisung und Spannungsanhebung braucht man deshalb `HAUSHALT` plus einen `Generator` mit `Profile.PV`. P25/S25 an derselben Last zusätzlich mit einem PV-Generator zu kombinieren, würde die PV doppelt zählen.
 
 **Blindleistung:** über `cos_phi`. Die Standardwerte sind Haushalt 0,97, Gewerbe 0,95 sowie PV und Wind 1,0. Wird einer Last aus einem Netzmodell (z. B. CIGRE) ein Profil zugeordnet, bleibt ihr bisheriger Leistungsfaktor erhalten. Bei `FEST` ohne `cos_phi` bleibt `q_mvar` konstant.
 
 **Skalierung über die Jahreshöchstleistung:** Gibt man einer Haushalts- oder Gewerbelast statt `annual_kwh` eine Leistung `p_mw`, wird diese als **höchste Stundenleistung des Jahres** interpretiert. Daraus wird der Jahresverbrauch berechnet:
 
-- 1 MW Höchstleistung entspricht beim Haushaltsprofil etwa 4,4 GWh/a, beim Gewerbeprofil etwa 3,7 GWh/a.
+- 1 MW Höchstleistung entspricht etwa 4,4 GWh/a (H25), 3,7 GWh/a (G25), 4,3 GWh/a (L25), 3,1 GWh/a (P25) bzw. 2,0 GWh/a (S25).
 - So werden die CIGRE-Lasten (`p_mw` = Bemessungsleistung) automatisch skaliert.
 - Gespeichert wird in `net.load.p_mw` immer diese Höchstleistung. Ein einzelner `pp.runpp` auf dem Netz rechnet also den Starklastfall.
 
@@ -142,8 +149,8 @@ sim1.runSimulation(months=None, tap=None)
 |---|---|
 | `sim1.summary()` | Kennzahlen: Spannungsbereich (mit Bus und Zeitpunkt), Stunden außerhalb des Spannungsbands, max. Leitungs-/Trafoauslastung, Rückspeisung, Energie |
 | `sim1.summary(by="month")` | dieselben Kennzahlen je Monat |
-| `sim1.createDiagram(diagram, elements, months=None, layout="week", time=None, title=None, limits=True, save=False, show=True)` | Diagramme (siehe unten) |
-| `sim.compare([sim1, sim2], diagram, elements, months=None, layout="week")` | dieselbe Größe aus mehreren Simulationen in einem Diagramm |
+| `sim1.createDiagram(diagram, elements, months=None, layout="week", time=None, title=None, limits=True, save=False, show=True, markers=None)` | Diagramme (siehe unten) |
+| `sim.compare([sim1, sim2], diagram, elements, months=None, layout="week", markers=None)` | dieselbe Größe aus mehreren Simulationen in einem Diagramm |
 
 **Diagrammarten (`Diagram`):**
 
@@ -170,6 +177,20 @@ sim1.runSimulation(months=None, tap=None)
 
 - **`time`** (nur für `VOLTAGE_PROFILE`): ein Zeitstempel, `"min"` (Zeitpunkt der niedrigsten Spannung) oder `"max"`.
 - **`save=True`:** speichert die Diagramme als PNG in `simulations/<name>/diagrams/`.
+- **`markers`:** Liste eigener Markierungen, jede als `(farbe, wert, text)` oder `{"color": …, "value": …, "text": …}`. Optional gibt ein 4. Element bzw. `"style"` den Linienstil an (`"-"`, `"--"`, `":"`, `"-."`, Standard `"-."`).
+
+  | `wert` | Darstellung | Layouts |
+  |---|---|---|
+  | Zahl | waagerechte Linie, Text rechts darüber | alle |
+  | Zeitpunkt, z. B. `"2025-07-23 13:00"` | senkrechte Linie, Text senkrecht daneben | `week`, `season`, `overview` (nur wenn der Zeitpunkt in der gezeigten Woche liegt) |
+
+  ```python
+  sim1.createDiagram(Diagram.VOLTAGE, ["Bus 6", "Bus 11"], months=Month.JULY, markers=[
+      ("orange", 0.95, "Warnschwelle 0,95 pu"),
+      ("green", 1.00, "Nennspannung", ":"),
+      ("purple", "2025-07-23 13:00", "PV-Spitze"),
+  ])
+  ```
 
 ### Einstellungen
 
@@ -197,6 +218,9 @@ sim.Switch("S4", bus="Bus 9", element="Line 9-X", type="LBS", closed=False)
 sim.Load("Wohngebiet", bus="Bus 3", profile=Profile.HAUSHALT, annual_kwh=500_000)
 sim.Load("Halle", bus="Bus 9", profile=Profile.GEWERBE, p_mw=0.4)           # p_mw = Jahreshöchstleistung
 sim.Load("Pumpe", bus="Bus 9", profile=Profile.FEST, p_mw=0.1, cos_phi=0.85)
+sim.Load("Hof", bus="Bus 13", profile=Profile.LANDWIRTSCHAFT, annual_kwh=200_000)
+sim.Load("Siedlung mit PV", bus="Bus 4", profile=Profile.HAUSHALT_PV, annual_kwh=500_000)
+sim.Load("Siedlung mit PV+Speicher", bus="Bus 5", profile=Profile.HAUSHALT_PV_SPEICHER, annual_kwh=400_000)
 sim.Generator("PV Dach", bus="Bus 4", profile=Profile.PV, kwp=250)
 sim.Generator("WEA 2", bus="Bus 13", profile=Profile.WIND, p_mw=2.0)
 ```
