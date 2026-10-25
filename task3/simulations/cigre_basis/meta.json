@@ -1,0 +1,113 @@
+{
+  "name": "cigre_basis",
+  "meta": {
+    "created": "2026-10-21T14:44:30",
+    "modified": "2026-10-21T14:44:31",
+    "parent": null,
+    "last_run": "2026-10-21T14:45:37",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Element hinzugefügt",
+      "element": "Neubaugebiet",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Element hinzugefügt",
+      "element": "PV-Freifläche",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Element hinzugefügt",
+      "element": "Kühlhaus",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Parameter geändert",
+      "element": "Line 1-2",
+      "tabelle": "line",
+      "parameter": "length_km",
+      "alt": 2.82,
+      "neu": 3.2
+    },
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Parameter geändert",
+      "element": "Load CI9",
+      "tabelle": "load",
+      "parameter": "annual_kwh",
+      "alt": 2108460.300310895,
+      "neu": 3000000.0
+    },
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Parameter geändert",
+      "element": "WKA 7",
+      "tabelle": "sgen",
+      "parameter": "p_mw",
+      "alt": 1.5,
+      "neu": 2.0
+    },
+    {
+      "zeit": "2026-10-21T14:44:31",
+      "aktion": "Element gelöscht",
+      "element": "PV 11",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    }
+  ]
+}
