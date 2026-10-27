@@ -129,3 +129,31 @@ def component_overview(net):
              "storage": "Speicher", "shunt": "Querelemente"}
     rows = [{"Tabelle": f"net.{t}", "Element": descr[t], "Anzahl": len(net[t])} for t in tables if len(net[t])]
     return pd.DataFrame(rows).set_index("Tabelle")
+
+
+def table(df, decimals=1, cmap=None, vmin=None, vmax=None, int_cols=None):
+    """
+    Tabelle für die Anzeige im Notebook.
+
+    Mit installiertem jinja2 wird ein formatierter pandas-Styler zurückgegeben (feste
+    Nachkommastellen, optional farbig hinterlegt mit cmap/vmin/vmax). Ohne jinja2 wird die
+    Tabelle gerundet als normaler DataFrame zurückgegeben, damit das Notebook trotzdem läuft.
+
+    decimals : Nachkommastellen aller Zahlenspalten
+    int_cols : Spalten ohne Nachkommastellen (z. B. Stundenzahlen)
+    """
+    import importlib.util
+    int_cols = list(int_cols or [])
+    num = [c for c in df.select_dtypes("number").columns if c not in int_cols]
+    if importlib.util.find_spec("jinja2") is None:
+        out = df.copy()
+        out[num] = out[num].round(decimals)
+        for c in int_cols:
+            out[c] = out[c].round().astype("Int64")
+        return out
+    styler = df.style.format(f"{{:.{decimals}f}}", subset=num)
+    if int_cols:
+        styler = styler.format("{:.0f}", subset=int_cols)
+    if cmap is not None:
+        styler = styler.background_gradient(cmap=cmap, vmin=vmin, vmax=vmax, axis=None, subset=num)
+    return styler

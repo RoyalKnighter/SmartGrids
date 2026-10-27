@@ -994,12 +994,12 @@ class Simulation:
         return self.results.energy_balance(self.net)
 
     def createDiagram(self, diagram, elements=None, months=None, layout="week", time=None,
-                      title=None, limits=True, save=False, show=True, markers=None):
+                      title=None, limits=True, save=False, show=True, markers=None, labels=True):
         """
         Diagramm erzeugen.
 
         diagram : Diagram.VOLTAGE, LINE_LOADING, TRAFO_LOADING, TRAFO_POWER, ELEMENT_POWER,
-                  VOLTAGE_PROFILE, POWER_FLOW
+                  VOLTAGE_PROFILE, POWER_FLOW, NETWORK
                   POWER_FLOW: Bezug externes Netz, Trafos, Lasten und Erzeugung je Profil, Verluste;
                   bei layout="week" zweiteilig (oben Netz und Lasten, unten Erzeugung und Verluste).
                   elements wählt Spalten aus sim.powerFlow() aus, z. B. ["Bezug externes Netz",
@@ -1008,7 +1008,10 @@ class Simulation:
         months  : Monat oder Liste von Monaten (Standard: alle simulierten)
         layout  : "week" (ein Diagramm je Monat), "season" (je Jahreszeit), "overview"
                   (alle Wochen hintereinander), "boxplot" (Verteilung je Monat)
-        time    : nur VOLTAGE_PROFILE: Zeitpunkt (Timestamp/str), "min" oder "max"
+        time    : VOLTAGE_PROFILE: Zeitpunkt (Timestamp/str), "min" oder "max"
+                  NETWORK: Zeitpunkt, "min", "max" (Busspannung), "max_loading" (Leitung),
+                  "max_trafo" oder eine Liste davon; mit months und Stichwort je Monat ein Plan
+        labels  : nur NETWORK: Namen und Werte neben die Komponenten schreiben
         save    : Diagramme als PNG im Simulationsordner (diagrams/) speichern
         show    : Diagramme anzeigen; mit show=False werden die Figures zurückgegeben
         markers : Liste von Markierungen, je (farbe, wert, text), z. B.
@@ -1019,5 +1022,6 @@ class Simulation:
         self._require_results()
         out_dir = (SIM_DIR / self.name / "diagrams") if save else None
         figs = diagrams.create(self, diagram, elements, months=months, layout=layout, time=time,
-                               title=title, limits=limits, out_dir=out_dir, show=show, markers=markers)
+                               title=title, limits=limits, out_dir=out_dir, show=show, markers=markers,
+                               labels=labels)
         return None if show else figs

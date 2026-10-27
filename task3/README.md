@@ -36,6 +36,7 @@ sim1 = sim.loadSimulation("cigre_basis")
 | `simulation.py` | Klasse `Simulation` und Modulfunktionen (`init`, `loadSimulation`, `listSimulations`, `deleteSimulation`, `compare`) |
 | `elements.py` | Elementklassen (`Bus`, `Line`, `Trafo`, `ExtGrid`, `Switch`, `Load`, `Generator`) und Enums `Profile`, `Diagram` |
 | `timeseries.py` | normierte Zeitreihen je Profil, Skalierung über die Jahreshöchstleistung |
+| `netplan.py` | Netzplan mit Ergebnissen (Diagrammart `NETWORK`, `plot_static`) |
 | `diagrams.py` | Klasse `Results` (Ergebnisse, Kennzahlen, Speichern/Laden) und alle Diagramme |
 | `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25, L25, P25, S25) und Wetter/PV/Wind (aus Task 2) |
 | `plots.py` | Zeitachse der Diagramme (6-h-Takt, Tageslinien, Datum) |
@@ -164,7 +165,29 @@ sim1.runSimulation(months=None, tap=None)
 | `TRAFO_POWER` | Wirkleistung Trafo OS [MW] | Trafos | 0 |
 | `ELEMENT_POWER` | Leistung von Lasten/Erzeugern [MW] | Lasten, Erzeuger | – |
 | `VOLTAGE_PROFILE` | Spannung entlang eines Pfades zu einem Zeitpunkt | Busse in Pfadreihenfolge | `v_min`, `v_max` |
+| `NETWORK` | Netzplan zu einem Zeitpunkt (Spannung und Auslastung farbig) | – (Zeitpunkt über `time`) | – |
 | `POWER_FLOW` | Leistungsfluss [MW]: externes Netz, Trafos, Lasten und Erzeuger je Profil, Verluste | Spaltennamen aus `sim1.powerFlow()`, z. B. `["Bezug externes Netz", "Erzeugung PV"]` | 0 |
+
+**Netzplan (`NETWORK`):** Busse sind Kreise, Leitungen Linien, Trafos zwei Kreise auf einer grauen Linie zwischen OS- und US-Bus. Schalter sind Quadrate auf der Leitung nahe ihrem Bus: schwarz = geschlossen, weiß = offen. Das externe Netz ist ein schraffiertes Quadrat. Neben jeder Komponente stehen Name und Ergebniswert.
+
+| Farbe | Skala |
+|---|---|
+| Bus | Spannung 0,8 … 1,2 pu: lila – blau – grün (1,0 pu) – gelb – rot |
+| Leitung, Trafo | Auslastung 0 … 100 %: grün – gelb – rot, schwarz über 100 % |
+
+| `time` | Zeitpunkt |
+|---|---|
+| `"2025-07-23 13:00"` | fester Zeitpunkt (muss in einer simulierten Woche liegen) |
+| `"min"` / `"max"` | niedrigste / höchste Busspannung (bei `"max"` ohne Slack-Bus) |
+| `"max_loading"` / `"max_trafo"` | höchste Leitungs- / Trafoauslastung (Standard: `"max_loading"`) |
+| Liste | ein Plan je Eintrag |
+
+Mit `months` und einem Stichwort entsteht je Monat ein Plan. `labels=False` blendet Namen und Werte aus, zum Beispiel bei großen Netzen. Die Lage der Busse kommt aus den Geodaten des Netzes. Busse ohne Geodaten (z. B. nach `attachNetwork`) werden automatisch angeordnet. Für einen einzelnen Lastfluss ohne Simulation: `netplan.plot_static(net)` nach `pp.runpp(net)`.
+
+```python
+sim1.createDiagram(Diagram.NETWORK, time="2025-07-23 13:00")
+sim1.createDiagram(Diagram.NETWORK, time="min", months=[Month.JANUARY, Month.JULY])
+```
 
 Bei `POWER_FLOW` mit `layout="week"` besteht jedes Diagramm aus zwei Teilen: oben das externe Netz, die Trafos und die Lasten, unten die Erzeugung und die Verluste mit eigener Skala. Die Erzeugung ist im CIGRE-Netz viel kleiner als die Last und wäre sonst nicht zu erkennen. Ein positiver Bezug bedeutet Leistung aus dem vorgelagerten Netz, ein negativer Bezug Rückspeisung.
 

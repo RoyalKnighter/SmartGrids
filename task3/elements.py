@@ -54,6 +54,7 @@ class Diagram(Enum):
     ELEMENT_POWER = "Leistung von Lasten und Erzeugern"
     VOLTAGE_PROFILE = "Spannungsverlauf entlang eines Pfades"
     POWER_FLOW = "Leistungsfluss"
+    NETWORK = "Netzplan zu einem Zeitpunkt"
 
 
 # ---------------------------------------------------------------------------

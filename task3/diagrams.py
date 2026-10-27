@@ -14,6 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import plots
+import netplan
 from elements import Diagram
 from profiles import Month, Season
 
@@ -335,9 +336,11 @@ def _finish(fig, out_dir, filename, show):
 
 
 def create(sim, diagram, elements=None, months=None, layout="week", time=None, title=None,
-           limits=True, out_dir=None, show=True, markers=None):
+           limits=True, out_dir=None, show=True, markers=None, labels=True):
     """Diagramm(e) einer Simulation. Rückgabe: Liste der Figures."""
     res = sim.results
+    if diagram == Diagram.NETWORK:
+        return _network(sim, months, time, title, labels, out_dir, show)
     if diagram == Diagram.VOLTAGE_PROFILE:
         return [_voltage_profile(sim, elements, time, title, limits, out_dir, show, markers)]
     df, ylabel, _, kind = _source(res, diagram, sim.net)
@@ -492,6 +495,28 @@ def _power_flow_weeks(sim, df, cols, months, label, markers, out_dir, show):
         axes[-1, 0].set_xlabel("Uhrzeit [h]")
         fig.suptitle(f"{label} – {m.label} ({idx[0]:%d.%m.}–{idx[-1]:%d.%m.%Y})")
         _finish(fig, out_dir, f"POWER_FLOW_week_{m.name}.png", show)
+        figs.append(fig)
+    return figs
+
+
+def _network(sim, months, time, title, labels, out_dir, show):
+    """
+    Netzplan zu einem oder mehreren Zeitpunkten.
+    time = Zeitpunkt, Stichwort ("min", "max", "max_loading", "max_trafo") oder Liste davon.
+    Mit months und einem Stichwort (oder time=None → "max_loading") entsteht je Monat ein Plan.
+    """
+    times = list(time) if isinstance(time, (list, tuple)) else [time]
+    keyword = lambda t: t is None or (isinstance(t, str) and t in netplan.TIME_KEYS)
+    jobs = []
+    for t in times:
+        if months is not None and keyword(t):
+            jobs += [(t, [m]) for m in _months(sim.results, months)]
+        else:
+            jobs.append((t, None))
+    figs = []
+    for t, ms in jobs:
+        fig, ts = netplan.plot_time(sim, t, ms, title=title, labels=labels)
+        _finish(fig, out_dir, f"NETWORK_{pd.Timestamp(ts):%Y%m%d_%H}.png", show)
         figs.append(fig)
     return figs
 
