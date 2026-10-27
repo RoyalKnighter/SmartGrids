@@ -168,7 +168,7 @@ sim1.runSimulation(months=None, tap=None)
 | `NETWORK` | Netzplan zu einem Zeitpunkt (Spannung und Auslastung farbig) | – (Zeitpunkt über `time`) | – |
 | `POWER_FLOW` | Leistungsfluss [MW]: externes Netz, Trafos, Lasten und Erzeuger je Profil, Verluste | Spaltennamen aus `sim1.powerFlow()`, z. B. `["Bezug externes Netz", "Erzeugung PV"]` | 0 |
 
-**Netzplan (`NETWORK`):** Busse sind Kreise, Leitungen Linien, Trafos zwei Kreise auf einer grauen Linie zwischen OS- und US-Bus. Schalter sind Quadrate auf der Leitung nahe ihrem Bus: schwarz = geschlossen, weiß = offen. Das externe Netz ist ein schraffiertes Quadrat. Neben jeder Komponente stehen Name und Ergebniswert.
+**Netzplan (`NETWORK`):** Busse sind Kreise, Leitungen Linien, Trafos zwei Kreise auf einer grauen Linie zwischen OS- und US-Bus. Schalter sind Quadrate auf der Leitung nahe ihrem Bus: schwarz = geschlossen, weiß = offen. Das externe Netz ist ein schraffiertes Quadrat. Lasten sind Pfeile vom Bus weg, Erzeuger Kreise mit einem G. Sie werden in die freien Richtungen um ihren Bus verteilt. Neben jeder Komponente stehen Name und Ergebniswert, bei Lasten und Erzeugern zusätzlich das Profil (Haushalt, Gewerbe, PV, Wind usw.) und die Leistung zum gewählten Zeitpunkt.
 
 | Farbe | Skala |
 |---|---|
@@ -182,7 +182,7 @@ sim1.runSimulation(months=None, tap=None)
 | `"max_loading"` / `"max_trafo"` | höchste Leitungs- / Trafoauslastung (Standard: `"max_loading"`) |
 | Liste | ein Plan je Eintrag |
 
-Mit `months` und einem Stichwort entsteht je Monat ein Plan. `labels=False` blendet Namen und Werte aus, zum Beispiel bei großen Netzen. Die Lage der Busse kommt aus den Geodaten des Netzes. Busse ohne Geodaten (z. B. nach `attachNetwork`) werden automatisch angeordnet. Für einen einzelnen Lastfluss ohne Simulation: `netplan.plot_static(net)` nach `pp.runpp(net)`.
+Mit `months` und einem Stichwort entsteht je Monat ein Plan. `elements=False` blendet Lasten und Erzeuger aus, `labels=False` blendet Namen und Werte aus, zum Beispiel bei großen Netzen. Die Lage der Busse kommt aus den Geodaten des Netzes. Busse ohne Geodaten (z. B. nach `attachNetwork`) werden automatisch angeordnet. Für einen einzelnen Lastfluss ohne Simulation: `netplan.plot_static(net)` nach `pp.runpp(net)`.
 
 ```python
 sim1.createDiagram(Diagram.NETWORK, time="2025-07-23 13:00")

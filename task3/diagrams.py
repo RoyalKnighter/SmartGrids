@@ -340,7 +340,8 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
     """Diagramm(e) einer Simulation. Rückgabe: Liste der Figures."""
     res = sim.results
     if diagram == Diagram.NETWORK:
-        return _network(sim, months, time, title, labels, out_dir, show)
+        show_elements = elements if isinstance(elements, bool) else True
+        return _network(sim, months, time, title, labels, out_dir, show, show_elements)
     if diagram == Diagram.VOLTAGE_PROFILE:
         return [_voltage_profile(sim, elements, time, title, limits, out_dir, show, markers)]
     df, ylabel, _, kind = _source(res, diagram, sim.net)
@@ -499,7 +500,7 @@ def _power_flow_weeks(sim, df, cols, months, label, markers, out_dir, show):
     return figs
 
 
-def _network(sim, months, time, title, labels, out_dir, show):
+def _network(sim, months, time, title, labels, out_dir, show, show_elements=True):
     """
     Netzplan zu einem oder mehreren Zeitpunkten.
     time = Zeitpunkt, Stichwort ("min", "max", "max_loading", "max_trafo") oder Liste davon.
@@ -515,7 +516,7 @@ def _network(sim, months, time, title, labels, out_dir, show):
             jobs.append((t, None))
     figs = []
     for t, ms in jobs:
-        fig, ts = netplan.plot_time(sim, t, ms, title=title, labels=labels)
+        fig, ts = netplan.plot_time(sim, t, ms, title=title, labels=labels, elements=show_elements)
         _finish(fig, out_dir, f"NETWORK_{pd.Timestamp(ts):%Y%m%d_%H}.png", show)
         figs.append(fig)
     return figs

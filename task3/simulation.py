@@ -1012,6 +1012,7 @@ class Simulation:
                   NETWORK: Zeitpunkt, "min", "max" (Busspannung), "max_loading" (Leitung),
                   "max_trafo" oder eine Liste davon; mit months und Stichwort je Monat ein Plan
         labels  : nur NETWORK: Namen und Werte neben die Komponenten schreiben
+                  (bei NETWORK blendet elements=False die Lasten und Erzeuger aus)
         save    : Diagramme als PNG im Simulationsordner (diagrams/) speichern
         show    : Diagramme anzeigen; mit show=False werden die Figures zurückgegeben
         markers : Liste von Markierungen, je (farbe, wert, text), z. B.

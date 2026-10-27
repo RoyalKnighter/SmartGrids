@@ -10,6 +10,10 @@ Darstellung:
     Schalter     Quadrat auf der Leitung bzw. dem Trafo, nahe dem Bus, an dem er sitzt;
                  schwarz = geschlossen, weiß = offen
     ext. Netz    schraffiertes Quadrat über dem Anschlussbus
+    Last         Pfeil vom Bus weg
+    Erzeuger     Kreis mit G
+Lasten und Erzeuger werden in die freien Richtungen um ihren Bus verteilt; daneben stehen
+Name, Profil und die Leistung zum gewählten Zeitpunkt.
 Neben jeder Komponente steht ihr Name, darunter der Ergebniswert.
 
 Die Lage der Busse kommt aus den Geodaten des Netzes (net.bus.geo bzw. net.bus_geodata).
@@ -39,6 +43,28 @@ LOADING_CMAP = LinearSegmentedColormap.from_list(
     "auslastung", [(0.0, "green"), (0.5, "yellow"), (1.0, "red")])
 LOADING_CMAP.set_over("black")
 NO_RESULT = "lightgray"
+
+PROFILE_LABEL = {"HAUSHALT": "Haushalt", "GEWERBE": "Gewerbe", "LANDWIRTSCHAFT": "Landwirtschaft",
+                 "HAUSHALT_PV": "Haushalt mit PV", "HAUSHALT_PV_SPEICHER": "Haushalt mit PV + Speicher",
+                 "PV": "PV", "WIND": "Wind", "FEST": "konstant"}
+SGEN_TYPE_LABEL = {"PV": "PV", "WP": "Wind", "Wind": "Wind"}
+
+
+def _profile_label(net, table, idx):
+    """Profil eines Elements als Text; ohne Profilspalte aus Name bzw. Typ abgeleitet."""
+    r = net[table].loc[idx]
+    prof = r.get("profile") if "profile" in net[table] else None
+    if isinstance(prof, str) and prof:
+        return PROFILE_LABEL.get(prof, prof)
+    name = str(r.get("name", ""))
+    if table == "load":
+        if name.startswith("Load R") or name.startswith("HH "):
+            return "Haushalt"
+        if name.startswith("Load CI"):
+            return "Gewerbe"
+        return ""
+    return SGEN_TYPE_LABEL.get(str(r.get("type", "")), "")
+
 
 # Zeitpunkte, die über ein Stichwort gewählt werden können
 TIME_KEYS = {
@@ -145,14 +171,16 @@ def _label(ax, x, y, text, fontsize, ha="left", va="bottom", color="black"):
             bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=0.6))
 
 
-def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, title=None, labels=True,
-         values=True, v_range=V_RANGE, ax=None, figsize=(13, 11)):
+def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None, sgen_p_mw=None,
+         title=None, labels=True, values=True, elements=True, v_range=V_RANGE, ax=None, figsize=(14, 12)):
     """
     Netzplan zeichnen.
 
-    vm_pu, line_loading, trafo_loading : Series oder dict, Schlüssel = Elementname
-    labels  : Namen neben die Komponenten schreiben
+    vm_pu, line_loading, trafo_loading, load_p_mw, sgen_p_mw :
+              Series oder dict, Schlüssel = Elementname
+    labels  : Namen (und bei Lasten/Erzeugern das Profil) neben die Komponenten schreiben
     values  : Ergebniswert unter den Namen schreiben
+    elements: Lasten (Pfeil) und Erzeuger (Kreis mit G) einzeichnen
     Rückgabe: Figure
     """
     pos = bus_positions(net)
@@ -168,6 +196,8 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, title=None, lab
     vm = _values(vm_pu, net.bus["name"])
     ll = _values(line_loading, net.line["name"]) if len(net.line) else {}
     tl = _values(trafo_loading, net.trafo["name"]) if len(net.trafo) else {}
+    lp = _values(load_p_mw, net.load["name"]) if len(net.load) else {}
+    gp = _values(sgen_p_mw, net.sgen["name"]) if len(net.sgen) else {}
 
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
@@ -281,22 +311,45 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, title=None, lab
         gap = lambda ang: min(abs((ang - e + np.pi) % (2 * np.pi) - np.pi) for e in edges[b])
         return max(corners, key=lambda c: gap(c[0]) + (0.05 if c is corners[0] else 0))
 
+    attached = {b: [] for b in pos}                                  # (Tabelle, Index) je Bus
+    if elements:
+        for table in ("load", "sgen"):
+            if table in net and len(net[table]):
+                for idx, r in net[table].iterrows():
+                    attached[r.bus].append((table, idx))
+
+    def gap_to(ang, occupied):
+        if not occupied:
+            return np.pi
+        return min(abs((ang - e + np.pi) % (2 * np.pi) - np.pi) for e in occupied)
+
     for idx, r in net.bus.iterrows():
         x, y = pos[idx]
         v = vm.get(r["name"])
         ax.add_patch(Circle((x, y), r_bus, facecolor=_voltage_color(v, v_range), edgecolor="black",
                             lw=1.0, zorder=7, alpha=1 if r.in_service else 0.4))
+        corner = free_corner(idx)
         if labels:
             txt = r["name"]
             if values and v is not None and not pd.isna(v):
                 txt += f"\n{v:.3f} pu"
-            _, ha, va, (sx, sy) = free_corner(idx)
+            _, ha, va, (sx, sy) = corner
             _label(ax, x + sx * 0.9 * r_bus, y + sy * 0.9 * r_bus, txt, fs, ha=ha, va=va)
 
+        # Lasten und Erzeuger in die freien Richtungen um den Bus verteilen
+        occupied = list(edges[idx]) + ([corner[0]] if labels else [])
+        candidates = np.deg2rad(np.arange(-180, 180, 15))
+        for table, el in attached[idx]:
+            ang = max(candidates, key=lambda a: (round(gap_to(a, occupied), 3), -abs(a + np.pi / 2)))
+            occupied.append(ang)
+            _draw_element(ax, net, table, el, np.array([x, y]), ang, r_bus,
+                          (lp if table == "load" else gp).get(net[table].at[el, "name"]),
+                          labels, values, fs_small)
+
     # ---------------- Achsen und Farbskalen
-    pad = 4 * r_bus
+    pad = 4 * r_bus * (1.6 if elements else 1.0)                    # Platz für Lasten/Erzeuger am Rand
     ax.set_xlim(pts[:, 0].min() - pad * 1.8, pts[:, 0].max() + pad * 1.8)
-    ax.set_ylim(pts[:, 1].min() - pad, pts[:, 1].max() + pad * 1.8)
+    ax.set_ylim(pts[:, 1].min() - pad * 1.3, pts[:, 1].max() + pad * 1.8)
     ax.set_aspect("equal")
     ax.axis("off")
     from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -313,6 +366,40 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, title=None, lab
     return fig
 
 
+def _draw_element(ax, net, table, idx, bus_xy, ang, r_bus, p_mw, labels, values, fontsize):
+    """Last als Pfeil vom Bus weg, Erzeuger als Kreis mit G, verbunden über eine kurze Linie."""
+    u = np.array([np.cos(ang), np.sin(ang)])
+    r = net[table].loc[idx]
+    alpha = 1.0 if r.in_service else 0.35
+    reach = 3.4 * r_bus                                               # Abstand Busmitte → Symbolende
+    if table == "load":
+        start, end = bus_xy + u * r_bus, bus_xy + u * reach
+        ax.annotate("", xy=end, xytext=start, zorder=4,
+                    arrowprops=dict(arrowstyle="-|>", color="black", lw=1.4, mutation_scale=12, alpha=alpha,
+                                    shrinkA=0, shrinkB=0))
+        tip = end
+    else:
+        r_g = 0.7 * r_bus
+        center = bus_xy + u * (reach - r_g)
+        ax.plot(*zip(bus_xy + u * r_bus, center - u * r_g), color="black", lw=1.2, zorder=4, alpha=alpha)
+        ax.add_patch(Circle(center, r_g, facecolor="white", edgecolor="black", lw=1.3, zorder=6, alpha=alpha))
+        ax.text(*center, "G", ha="center", va="center", fontsize=fontsize, fontweight="bold", zorder=7,
+                alpha=alpha)
+        tip = center + u * r_g
+    if not labels:
+        return
+    lines = [str(r["name"])]
+    prof = _profile_label(net, table, idx)
+    if prof:
+        lines.append(prof)
+    if values and p_mw is not None and not pd.isna(p_mw):
+        lines.append(f"{p_mw * 1000:.0f} kW" if abs(p_mw) < 1 else f"{p_mw:.2f} MW")
+    p = tip + u * 0.35 * r_bus
+    ha = "left" if u[0] > 0.3 else "right" if u[0] < -0.3 else "center"
+    va = "bottom" if u[1] > 0.3 else "top" if u[1] < -0.3 else "center"
+    _label(ax, *p, "\n".join(lines), fontsize - 1, ha=ha, va=va, color="dimgray")
+
+
 def _legend(ax):
     from matplotlib.lines import Line2D
     handles = [
@@ -323,8 +410,10 @@ def _legend(ax):
                label="Trafo (Farbe = Auslastung)"),
         Line2D([], [], marker="s", ls="", markerfacecolor="black", markeredgecolor="black", label="Schalter geschlossen"),
         Line2D([], [], marker="s", ls="", markerfacecolor="white", markeredgecolor="black", label="Schalter offen"),
+        Line2D([], [], marker=r"$\rightarrow$", ls="", color="black", markersize=14, label="Last"),
+        Line2D([], [], marker=r"$\mathbf{G}$", ls="", color="black", markersize=8, label="Erzeuger"),
     ]
-    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.0), ncol=5, fontsize=8, frameon=False)
+    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.01), ncol=7, fontsize=8, frameon=False)
 
 
 # ---------------------------------------------------------------------------
@@ -362,22 +451,25 @@ def resolve_time(results, time, months=None, net=None):
     return t, None
 
 
-def plot_time(sim, time=None, months=None, title=None, labels=True, values=True):
+def plot_time(sim, time=None, months=None, title=None, labels=True, values=True, elements=True):
     """Netzplan einer Simulation zu einem Zeitpunkt (siehe resolve_time)."""
     res = sim.results
     t, reason = resolve_time(res, time, months, sim.net)
     label = title or f"Netzplan – Simulation '{sim.name}'"
     sub = f"{pd.Timestamp(t):%a %d.%m.%Y %H:%M}" + (f" ({reason})" if reason else "")
     return draw(sim.net, res.vm_pu.loc[t], res.line_loading.loc[t], res.trafo_loading.loc[t],
-                title=f"{label}\n{sub}", labels=labels, values=values), t
+                res.load_p_mw.loc[t], res.sgen_p_mw.loc[t],
+                title=f"{label}\n{sub}", labels=labels, values=values, elements=elements), t
 
 
-def plot_static(net, title="Netzplan – statischer Lastfluss", labels=True, values=True):
+def plot_static(net, title="Netzplan – statischer Lastfluss", labels=True, values=True, elements=True):
     """Netzplan mit den Ergebnissen von pp.runpp(net)."""
     names = lambda t: net[t]["name"]
     vm = pd.Series(net.res_bus.vm_pu.to_numpy(), index=names("bus"))
     ll = pd.Series(net.res_line.loading_percent.to_numpy(), index=names("line")) if len(net.line) else None
     tl = pd.Series(net.res_trafo.loading_percent.to_numpy(), index=names("trafo")) if len(net.trafo) else None
-    fig = draw(net, vm, ll, tl, title=title, labels=labels, values=values)
+    lp = pd.Series(net.res_load.p_mw.to_numpy(), index=names("load")) if len(net.load) else None
+    gp = pd.Series(net.res_sgen.p_mw.to_numpy(), index=names("sgen")) if len(net.sgen) else None
+    fig = draw(net, vm, ll, tl, lp, gp, title=title, labels=labels, values=values, elements=elements)
     plt.show()
     return fig
