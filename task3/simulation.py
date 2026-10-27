@@ -980,13 +980,30 @@ class Simulation:
         self._require_results()
         return self.results.summary(self.settings.get("v_min", 0.9), self.settings.get("v_max", 1.1), by=by)
 
+    def powerFlow(self):
+        """
+        Leistungsfluss je Stunde [MW]: Bezug aus dem externen Netz, Trafos (OS), Lasten und
+        Erzeugung gesamt und je Profil sowie Verluste (= Bezug + Erzeugung − Lasten).
+        """
+        self._require_results()
+        return self.results.power_flow(self.net)
+
+    def energyBalance(self):
+        """Energiebilanz je simulierter Woche (Monat) in MWh, Anteil der Erzeugung und Stunden Rückspeisung."""
+        self._require_results()
+        return self.results.energy_balance(self.net)
+
     def createDiagram(self, diagram, elements=None, months=None, layout="week", time=None,
                       title=None, limits=True, save=False, show=True, markers=None):
         """
         Diagramm erzeugen.
 
         diagram : Diagram.VOLTAGE, LINE_LOADING, TRAFO_LOADING, TRAFO_POWER, ELEMENT_POWER,
-                  VOLTAGE_PROFILE
+                  VOLTAGE_PROFILE, POWER_FLOW
+                  POWER_FLOW: Bezug externes Netz, Trafos, Lasten und Erzeugung je Profil, Verluste;
+                  bei layout="week" zweiteilig (oben Netz und Lasten, unten Erzeugung und Verluste).
+                  elements wählt Spalten aus sim.powerFlow() aus, z. B. ["Bezug externes Netz",
+                  "Lasten gesamt", "Erzeugung PV"]
         elements: Liste von Namen (Busse, Leitungen, Trafos, Lasten/Erzeuger); None = alle
         months  : Monat oder Liste von Monaten (Standard: alle simulierten)
         layout  : "week" (ein Diagramm je Monat), "season" (je Jahreszeit), "overview"

@@ -17,6 +17,10 @@ import plots
 from elements import Diagram
 from profiles import Month, Season
 
+_PROFILE_LABEL = {"HAUSHALT": "Haushalt", "GEWERBE": "Gewerbe", "LANDWIRTSCHAFT": "Landwirtschaft",
+                  "HAUSHALT_PV": "Haushalt mit PV", "HAUSHALT_PV_SPEICHER": "Haushalt mit PV und Speicher",
+                  "PV": "PV", "WIND": "Wind", "FEST": "konstant"}
+
 TABLES = ["vm_pu", "va_degree", "line_loading", "line_i_ka", "trafo_loading", "trafo_p_mw",
           "ext_grid_p_mw", "load_p_mw", "sgen_p_mw"]
 
@@ -44,6 +48,48 @@ class Results:
     def element_p_mw(self):
         """Wirkleistung aller Lasten (Bezug) und Erzeuger (Einspeisung) [MW]."""
         return pd.concat([self.load_p_mw, self.sgen_p_mw], axis=1)
+
+    def power_flow(self, net):
+        """
+        Leistungsfluss je Zeitschritt [MW]:
+            Bezug externes Netz      (> 0 Bezug aus dem vorgelagerten Netz, < 0 Rückspeisung)
+            <Trafo> (OS)             Wirkleistung je Transformator auf der Oberspannungsseite
+            Lasten gesamt, Lasten <Profil>
+            Erzeugung gesamt, Erzeugung <Profil>
+            Verluste                 = Bezug + Erzeugung − Lasten
+        Gruppiert wird nach der Spalte profile in net.load bzw. net.sgen.
+        """
+        out = pd.DataFrame(index=self.info.index)
+        ext = self.ext_grid_p_mw.sum(axis=1, min_count=1)
+        out["Bezug externes Netz"] = ext
+        for c in self.trafo_p_mw.columns:
+            out[f"{c} (OS)"] = self.trafo_p_mw[c]
+
+        def groups(df, table):
+            prof = net[table].set_index("name")["profile"] if "profile" in net[table] else pd.Series(dtype=object)
+            labels = {c: _PROFILE_LABEL.get(str(prof.get(c)), "ohne Profil") for c in df.columns}
+            return df.T.groupby(labels).sum().T if len(df.columns) else pd.DataFrame(index=df.index)
+
+        load, sgen = self.load_p_mw.sum(axis=1), self.sgen_p_mw.sum(axis=1)
+        out["Lasten gesamt"] = load
+        for c, v in groups(self.load_p_mw, "load").items():
+            out[f"Lasten {c}"] = v
+        out["Erzeugung gesamt"] = sgen
+        for c, v in groups(self.sgen_p_mw, "sgen").items():
+            out[f"Erzeugung {c}"] = v
+        out["Verluste"] = ext + sgen - load
+        out[~self.converged.to_numpy()] = np.nan
+        return out
+
+    def energy_balance(self, net):
+        """Energie je simulierter Woche (Monat) [MWh] aus dem Leistungsfluss (Stundenwerte)."""
+        pf = self.power_flow(net)
+        e = pf.groupby(self.info["month"], sort=False).sum()
+        e.index = [Month[m].label for m in e.index]
+        e.columns = [f"{c} [MWh]" for c in e.columns]
+        e["Anteil Erzeugung an Last [%]"] = 100 * e["Erzeugung gesamt [MWh]"] / e["Lasten gesamt [MWh]"]
+        e["Stunden Rückspeisung"] = (pf["Bezug externes Netz"] < 0).groupby(self.info["month"], sort=False).sum().to_numpy()
+        return e
 
     @property
     def converged(self):
@@ -147,8 +193,10 @@ class Results:
 # Diagramme
 # ---------------------------------------------------------------------------
 
-def _source(results, diagram):
+def _source(results, diagram, net=None):
     """(Tabelle, y-Beschriftung, Grenzlinien, Elementart) für eine Diagrammart."""
+    if diagram == Diagram.POWER_FLOW:
+        return results.power_flow(net), "Wirkleistung [MW]", None, "Leistungsfluss"
     if diagram in (Diagram.VOLTAGE, Diagram.VOLTAGE_PROFILE):
         return results.vm_pu, "Spannung [pu]", None, "Bus"
     if diagram == Diagram.LINE_LOADING:
@@ -292,12 +340,14 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
     res = sim.results
     if diagram == Diagram.VOLTAGE_PROFILE:
         return [_voltage_profile(sim, elements, time, title, limits, out_dir, show, markers)]
-    df, ylabel, _, kind = _source(res, diagram)
+    df, ylabel, _, kind = _source(res, diagram, sim.net)
     cols = _select(df, elements, kind)
     months = _months(res, months)
     figs = []
     markers = parse_markers(markers)
     label = title or f"{diagram.value} – Simulation '{sim.name}'"
+    if diagram == Diagram.POWER_FLOW and layout == "week":
+        return _power_flow_weeks(sim, df, cols, months, label, markers, out_dir, show)
 
     if layout == "week":
         for m in months:
@@ -390,6 +440,62 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
     return figs
 
 
+_FLOW_STYLE = {"Bezug externes Netz": dict(color="black", lw=2.2),
+               "Lasten gesamt": dict(color="tab:red", lw=2.0),
+               "Erzeugung gesamt": dict(color="tab:green", lw=2.0),
+               "Verluste": dict(color="tab:gray", lw=1.2, ls=":")}
+_FLOW_COLORS = {"Haushalt": "tab:orange", "Gewerbe": "tab:purple", "Landwirtschaft": "tab:brown",
+                "PV": "gold", "Wind": "tab:blue"}
+
+
+_TRAFO_COLORS = ["tab:cyan", "teal", "slategray", "darkkhaki"]
+
+
+def _flow_style(col, trafo_no=0):
+    if col in _FLOW_STYLE:
+        return dict(_FLOW_STYLE[col])
+    if col.endswith("(OS)"):
+        return dict(color=_TRAFO_COLORS[trafo_no % len(_TRAFO_COLORS)], lw=1.2, ls="--")
+    for key, color in _FLOW_COLORS.items():
+        if col.endswith(key):
+            return dict(color=color, lw=1.4)
+    return dict(lw=1.3)
+
+
+def _power_flow_weeks(sim, df, cols, months, label, markers, out_dir, show):
+    """
+    Leistungsfluss je Monat (Woche) in zwei Teilen:
+      oben:  Bezug aus dem externen Netz, Trafos und Lasten
+      unten: Erzeugung (PV, Wind) und Verluste mit eigener Skala
+    """
+    res = sim.results
+    top = [c for c in cols if not (c.startswith("Erzeugung") or c == "Verluste")]
+    bottom = [c for c in cols if c not in top]
+    parts = [p for p in (top, bottom) if p]
+    figs = []
+    for m in months:
+        idx = res.info.index[res.info["month"] == m.name]
+        fig, axes = plt.subplots(len(parts), 1, figsize=(13, 3.6 * len(parts)), sharex=True, squeeze=False)
+        for ax, part in zip(axes[:, 0], parts):
+            trafos = [c for c in part if c.endswith("(OS)")]
+            for c in part:
+                ax.plot(idx, df.loc[idx, c], label=c,
+                        **_flow_style(c, trafos.index(c) if c in trafos else 0))
+            ax.axhline(0, color="black", lw=0.8)
+            _draw_markers(ax, markers, "time", index=idx)
+            plots.week_axis(ax, idx, label_days=ax is axes[0, 0])
+            ax.set_ylabel("Wirkleistung [MW]")
+            ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), fontsize=8)
+        if len(parts) == 2:
+            axes[0, 0].get_legend().set_title("Netz und Lasten", prop={"size": 8, "weight": "bold"})
+            axes[1, 0].get_legend().set_title("Erzeugung und Verluste", prop={"size": 8, "weight": "bold"})
+        axes[-1, 0].set_xlabel("Uhrzeit [h]")
+        fig.suptitle(f"{label} – {m.label} ({idx[0]:%d.%m.}–{idx[-1]:%d.%m.%Y})")
+        _finish(fig, out_dir, f"POWER_FLOW_week_{m.name}.png", show)
+        figs.append(fig)
+    return figs
+
+
 def _voltage_profile(sim, buses, time, title, limits, out_dir, show, markers=None):
     """Spannung entlang eines Pfades (Busse in Reihenfolge) zu einem Zeitpunkt."""
     res, net = sim.results, sim.net
@@ -431,7 +537,7 @@ def compare(simulations, diagram, elements, months=None, layout="week", title=No
             markers=None):
     """Dieselbe Größe mehrerer Simulationen in einem Diagramm (layout "week" oder "overview")."""
     base = simulations[0]
-    df0, ylabel, _, kind = _source(base.results, diagram)
+    df0, ylabel, _, kind = _source(base.results, diagram, base.net)
     cols = _select(df0, elements, kind)
     months = _months(base.results, months)
     figs = []
@@ -442,7 +548,7 @@ def compare(simulations, diagram, elements, months=None, layout="week", title=No
             fig, ax = plt.subplots(figsize=(13, 4))
             idx = None
             for k, s in enumerate(simulations):
-                df, *_ = _source(s.results, diagram)
+                df, *_ = _source(s.results, diagram, s.net)
                 sel = s.results.info.index[s.results.info["month"] == m.name]
                 idx = sel
                 for c in _select(df, cols, kind):
@@ -459,7 +565,7 @@ def compare(simulations, diagram, elements, months=None, layout="week", title=No
     elif layout == "overview":
         fig, ax = plt.subplots(figsize=(15, 4.5))
         for k, s in enumerate(simulations):
-            df, *_ = _source(s.results, diagram)
+            df, *_ = _source(s.results, diagram, s.net)
             sel = s.results.info["month"].isin([m.name for m in months]).to_numpy()
             for c in _select(df, cols, kind):
                 ax.plot(np.arange(sel.sum()), df.loc[sel, c].to_numpy(), ls=styles[k % 4], lw=0.9,

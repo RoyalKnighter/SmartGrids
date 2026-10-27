@@ -53,6 +53,7 @@ class Diagram(Enum):
     TRAFO_POWER = "Trafoleistung"
     ELEMENT_POWER = "Leistung von Lasten und Erzeugern"
     VOLTAGE_PROFILE = "Spannungsverlauf entlang eines Pfades"
+    POWER_FLOW = "Leistungsfluss"
 
 
 # ---------------------------------------------------------------------------

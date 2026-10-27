@@ -149,6 +149,8 @@ sim1.runSimulation(months=None, tap=None)
 |---|---|
 | `sim1.summary()` | Kennzahlen: Spannungsbereich (mit Bus und Zeitpunkt), Stunden außerhalb des Spannungsbands, max. Leitungs-/Trafoauslastung, Rückspeisung, Energie |
 | `sim1.summary(by="month")` | dieselben Kennzahlen je Monat |
+| `sim1.powerFlow()` | Leistungsfluss je Stunde [MW]: Bezug externes Netz, Trafos (OS), Lasten und Erzeugung gesamt und je Profil, Verluste (= Bezug + Erzeugung − Lasten) |
+| `sim1.energyBalance()` | Energie je simulierter Woche [MWh] aus `powerFlow()`, Anteil der Erzeugung an der Last, Stunden mit Rückspeisung |
 | `sim1.createDiagram(diagram, elements, months=None, layout="week", time=None, title=None, limits=True, save=False, show=True, markers=None)` | Diagramme (siehe unten) |
 | `sim.compare([sim1, sim2], diagram, elements, months=None, layout="week", markers=None)` | dieselbe Größe aus mehreren Simulationen in einem Diagramm |
 
@@ -162,6 +164,14 @@ sim1.runSimulation(months=None, tap=None)
 | `TRAFO_POWER` | Wirkleistung Trafo OS [MW] | Trafos | 0 |
 | `ELEMENT_POWER` | Leistung von Lasten/Erzeugern [MW] | Lasten, Erzeuger | – |
 | `VOLTAGE_PROFILE` | Spannung entlang eines Pfades zu einem Zeitpunkt | Busse in Pfadreihenfolge | `v_min`, `v_max` |
+| `POWER_FLOW` | Leistungsfluss [MW]: externes Netz, Trafos, Lasten und Erzeuger je Profil, Verluste | Spaltennamen aus `sim1.powerFlow()`, z. B. `["Bezug externes Netz", "Erzeugung PV"]` | 0 |
+
+Bei `POWER_FLOW` mit `layout="week"` besteht jedes Diagramm aus zwei Teilen: oben das externe Netz, die Trafos und die Lasten, unten die Erzeugung und die Verluste mit eigener Skala. Die Erzeugung ist im CIGRE-Netz viel kleiner als die Last und wäre sonst nicht zu erkennen. Ein positiver Bezug bedeutet Leistung aus dem vorgelagerten Netz, ein negativer Bezug Rückspeisung.
+
+```python
+sim1.createDiagram(Diagram.POWER_FLOW, months=Month.JULY)                       # alles
+sim1.createDiagram(Diagram.POWER_FLOW, ["Bezug externes Netz", "Erzeugung gesamt"], layout="overview")
+```
 
 **Auswahl:**
 
