@@ -1,0 +1,68 @@
+{
+  "name": "s1_zu_sw7_auf",
+  "meta": {
+    "created": "2026-10-28T12:43:09",
+    "modified": "2026-10-28T12:43:09",
+    "parent": "cigre_mv",
+    "last_run": "2026-10-28T12:45:10",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-10-28T12:43:09",
+      "aktion": "Parameter geändert",
+      "element": "S1",
+      "tabelle": "switch",
+      "parameter": "closed",
+      "alt": false,
+      "neu": true
+    },
+    {
+      "zeit": "2026-10-28T12:43:09",
+      "aktion": "Parameter geändert",
+      "element": "switch_7",
+      "tabelle": "switch",
+      "parameter": "closed",
+      "alt": true,
+      "neu": false
+    }
+  ]
+}
