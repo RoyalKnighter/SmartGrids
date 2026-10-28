@@ -40,6 +40,7 @@ sim1 = sim.loadSimulation("cigre_basis")
 | `diagrams.py` | Klasse `Results` (Ergebnisse, Kennzahlen, Speichern/Laden) und alle Diagramme |
 | `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25, L25, P25, S25) und Wetter/PV/Wind (aus Task 2) |
 | `plots.py` | Zeitachse der Diagramme (6-h-Takt, Tageslinien, Datum) |
+| `szenarien.py` | Schalterstellungen S1–S3 (8 Zustände), statische Lastflüsse aller Zustände, Zeitreihen aller Zustände, Vergleichstabellen und Heatmaps (Task 4) |
 | `data/` | BDEW-Profile und Wetterwochen |
 | `simulations/` | gespeicherte Simulationen (wird automatisch angelegt) |
 
@@ -117,8 +118,16 @@ Jede Last und jeder Erzeuger hat ein Profil. Es bestimmt den Leistungsverlauf ü
 ### Rechnen
 
 ```python
-sim1.runSimulation(months=None, tap=None)
+sim1.runSimulation(months=None, tap=None, force=False)
 ```
+
+**Nur rechnen, wenn sich etwas geändert hat:**
+
+```python
+sim.ONLY_RUN_IF_CHANGED = True      # einmal am Anfang des Notebooks
+```
+
+`runSimulation()` bildet dann einen Fingerabdruck aus dem Netz (alle Elementtabellen ohne Ergebnisse und Geodaten), den Einstellungen (`months`, `tap`, Grenzen), den Eingangsdaten in `data/` und der Programmversion (`CACHE_VERSION`). Stimmt er mit dem letzten gespeicherten Lauf derselben Simulation überein, werden die Ergebnisse aus `simulations/<name>/results/` geladen, statt neu zu rechnen. Das gilt auch nach `init(..., overwrite=True)` und `copy(..., overwrite=True)`: Bei aktivem Schalter bleiben die gespeicherten Ergebnisse beim Überschreiben erhalten und werden wiederverwendet, wenn das neue Netz gleich ist. Ändert sich etwas (z. B. ein Parameter oder eine Schalterstellung), wird neu gerechnet. `force=True` rechnet immer.
 
 - **`months`:** ein Monat oder eine Liste. Der Standard sind alle 12, also 2016 Lastflüsse. Die Angabe wird als Einstellung gespeichert.
 - **`tap`:** Stufenschalterstellung, gültig für alle Trafos mit Stufenschalter:
@@ -139,6 +148,8 @@ sim1.runSimulation(months=None, tap=None)
 |---|---|
 | `vm_pu`, `va_degree` | Spannung aller Busse (Betrag in pu, Winkel in Grad) |
 | `line_loading`, `line_i_ka` | Auslastung [%] und Strom [kA] aller Leitungen |
+| `line_p_mw`, `line_pl_mw` | Wirkleistung am Leitungsanfang `p_from_mw` [MW] (> 0: Fluss von `from_bus` nach `to_bus`) und Verluste je Leitung [MW] |
+| `trafo_pl_mw` | Verluste je Trafo [MW] |
 | `trafo_loading`, `trafo_p_mw` | Auslastung [%] und Wirkleistung auf der OS-Seite [MW] aller Trafos (< 0: Rückspeisung) |
 | `ext_grid_p_mw` | Wirkleistung am externen Netz (< 0: Rückspeisung ins vorgelagerte Netz) |
 | `load_p_mw`, `sgen_p_mw`, `element_p_mw` | eingesetzte Leistung der Lasten, Erzeuger bzw. beider |
@@ -163,12 +174,13 @@ sim1.runSimulation(months=None, tap=None)
 | `LINE_LOADING` | Leitungsauslastung [%] | Leitungen | 100 % |
 | `TRAFO_LOADING` | Trafoauslastung [%] | Trafos | 100 % |
 | `TRAFO_POWER` | Wirkleistung Trafo OS [MW] | Trafos | 0 |
+| `LINE_POWER` | Wirkleistung am Leitungsanfang [MW] (Vorzeichen = Richtung) | Leitungen | 0 |
 | `ELEMENT_POWER` | Leistung von Lasten/Erzeugern [MW] | Lasten, Erzeuger | – |
 | `VOLTAGE_PROFILE` | Spannung entlang eines Pfades zu einem Zeitpunkt | Busse in Pfadreihenfolge | `v_min`, `v_max` |
 | `NETWORK` | Netzplan zu einem Zeitpunkt (Spannung und Auslastung farbig) | – (Zeitpunkt über `time`) | – |
 | `POWER_FLOW` | Leistungsfluss [MW]: externes Netz, Trafos, Lasten und Erzeuger je Profil, Verluste | Spaltennamen aus `sim1.powerFlow()`, z. B. `["Bezug externes Netz", "Erzeugung PV"]` | 0 |
 
-**Netzplan (`NETWORK`):** Busse sind Kreise, Leitungen Linien, Trafos zwei Kreise auf einer grauen Linie zwischen OS- und US-Bus. Schalter sind Quadrate auf der Leitung nahe ihrem Bus: schwarz = geschlossen, weiß = offen. Das externe Netz ist ein schraffiertes Quadrat. Lasten sind Pfeile vom Bus weg, Erzeuger Kreise mit einem G. Sie werden in die freien Richtungen um ihren Bus verteilt. Neben jeder Komponente stehen Name und Ergebniswert, bei Lasten und Erzeugern zusätzlich das Profil (Haushalt, Gewerbe, PV, Wind usw.) und die Leistung zum gewählten Zeitpunkt.
+**Netzplan (`NETWORK`):** Busse sind Kreise, Leitungen Linien, Trafos zwei Kreise auf einer grauen Linie zwischen OS- und US-Bus. Schalter sind Quadrate auf der Leitung nahe ihrem Bus: schwarz = geschlossen, weiß = offen. Das externe Netz ist ein schraffiertes Quadrat. Lasten sind Pfeile vom Bus weg, Erzeuger Kreise mit einem G. Sie werden in die freien Richtungen um ihren Bus verteilt. Schwarze Pfeile auf Leitungen und Trafos zeigen die Richtung des Wirkleistungsflusses (aus `line_p_mw` bzw. `trafo_p_mw`; unter 1 kW kein Pfeil), der Betrag steht unter der Auslastung. Neben jeder Komponente stehen Name und Ergebniswert, bei Lasten und Erzeugern zusätzlich das Profil (Haushalt, Gewerbe, PV, Wind usw.) und die Leistung zum gewählten Zeitpunkt.
 
 | Farbe | Skala |
 |---|---|
@@ -270,9 +282,10 @@ Jede Simulation liegt in `simulations/<name>/`:
 | `net.json` | aktuelles Netz (`pandapower.to_json`, inkl. Profilspalten) |
 | `baseline.json` | Netz zum Zeitpunkt von `init` bzw. `copy` |
 | `results/*.csv` | Ergebnistabellen |
+| `fingerprint.txt` | Fingerabdruck und Zeitpunkt des letzten Laufs (für `ONLY_RUN_IF_CHANGED`) |
 | `diagrams/*.png` | mit `save=True` gespeicherte Diagramme |
 
-Eine Simulation mit 12 Wochen belegt beim CIGRE-Netz etwa 4 MB (vor allem die Ergebnistabellen). Wenn die Simulationen nicht ins Repository sollen, gehört `task3/simulations/` in die `.gitignore`.
+Eine Simulation mit 12 Wochen belegt beim CIGRE-Netz etwa 4 MB (vor allem die Ergebnistabellen). Wenn die Simulationen nicht ins Repository sollen, gehört `task4/simulations/` in die `.gitignore`.
 
 ---
 

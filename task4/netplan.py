@@ -14,6 +14,9 @@ Darstellung:
     Erzeuger     Kreis mit G
 Lasten und Erzeuger werden in die freien Richtungen um ihren Bus verteilt; daneben stehen
 Name, Profil und die Leistung zum gewählten Zeitpunkt.
+Schwarze Pfeile auf Leitungen und Trafos zeigen die Richtung des Wirkleistungsflusses; der Betrag
+steht unter der Auslastung. Vorzeichen in pandapower: p_from_mw > 0 heißt Fluss von from_bus nach
+to_bus, p_hv_mw > 0 heißt Fluss von der OS- zur US-Seite.
 Neben jeder Komponente steht ihr Name, darunter der Ergebniswert.
 
 Die Lage der Busse kommt aus den Geodaten des Netzes (net.bus.geo bzw. net.bus_geodata).
@@ -166,13 +169,41 @@ def _voltage_color(v, v_range):
     return VOLTAGE_CMAP(Normalize(*v_range, clip=True)(v))
 
 
+P_MIN_ARROW_MW = 0.001        # unter 1 kW kein Richtungspfeil (z. B. Leitungen hinter offenen Schaltern)
+
+
+def _fmt_p(p_mw):
+    return f"{p_mw * 1000:.0f} kW" if p_mw < 1 else f"{p_mw:.2f} MW"
+
+
+def _flow_arrow(ax, a, b, p_mw, r_bus, size=1.0):
+    """
+    Pfeil in der Mitte der Strecke a→b für die Richtung des Wirkleistungsflusses.
+    p_mw ist die Leistung am Anfang a (pandapower: p_from_mw bzw. p_hv_mw):
+    p > 0 → Fluss von a nach b, p < 0 → Fluss von b nach a.
+    """
+    if p_mw is None or pd.isna(p_mw) or abs(p_mw) < P_MIN_ARROW_MW:
+        return
+    d = np.asarray(b, float) - np.asarray(a, float)
+    L = np.hypot(*d)
+    if L == 0:
+        return
+    u = d / L * (1 if p_mw > 0 else -1)
+    mid = (np.asarray(a, float) + np.asarray(b, float)) / 2
+    half = min(0.8 * r_bus * size, 0.3 * L)
+    ax.annotate("", xy=mid + u * half, xytext=mid - u * half, zorder=4.5,
+                arrowprops=dict(arrowstyle="-|>,head_length=0.7,head_width=0.4", color="black",
+                                lw=1.6, mutation_scale=18 * size, shrinkA=0, shrinkB=0))
+
+
 def _label(ax, x, y, text, fontsize, ha="left", va="bottom", color="black"):
     ax.text(x, y, text, fontsize=fontsize, ha=ha, va=va, color=color, zorder=8,
             bbox=dict(facecolor="white", edgecolor="none", alpha=0.75, pad=0.6))
 
 
 def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None, sgen_p_mw=None,
-         title=None, labels=True, values=True, elements=True, v_range=V_RANGE, ax=None, figsize=(14, 12)):
+         line_p_mw=None, trafo_p_mw=None, title=None, labels=True, values=True, elements=True,
+         arrows=True, v_range=V_RANGE, ax=None, figsize=(14, 12)):
     """
     Netzplan zeichnen.
 
@@ -181,6 +212,9 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
     labels  : Namen (und bei Lasten/Erzeugern das Profil) neben die Komponenten schreiben
     values  : Ergebniswert unter den Namen schreiben
     elements: Lasten (Pfeil) und Erzeuger (Kreis mit G) einzeichnen
+    line_p_mw, trafo_p_mw : Wirkleistung am Leitungsanfang (p_from_mw) bzw. an der OS-Seite des
+              Trafos (p_hv_mw); daraus werden die Flussrichtungspfeile gezeichnet
+    arrows  : Pfeile für die Richtung des Wirkleistungsflusses auf Leitungen und Trafos
     Rückgabe: Figure
     """
     pos = bus_positions(net)
@@ -198,6 +232,8 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
     tl = _values(trafo_loading, net.trafo["name"]) if len(net.trafo) else {}
     lp = _values(load_p_mw, net.load["name"]) if len(net.load) else {}
     gp = _values(sgen_p_mw, net.sgen["name"]) if len(net.sgen) else {}
+    lpf = _values(line_p_mw, net.line["name"]) if len(net.line) else {}
+    tpf = _values(trafo_p_mw, net.trafo["name"]) if len(net.trafo) else {}
 
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
@@ -212,6 +248,9 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
         color = _loading_color(ll.get(r["name"]))
         ls = "-" if r.in_service else ":"
         ax.plot(*zip(a, b), color=color, lw=3.2, ls=ls, solid_capstyle="round", zorder=2)
+        p_line = lpf.get(r["name"])
+        if arrows:
+            _flow_arrow(ax, a, b, p_line, r_bus)
         if labels:
             mid, d = (a + b) / 2, b - a
             n = np.array([-d[1], d[0]]) / (np.hypot(*d) or 1)        # Normale zur Leitung
@@ -225,6 +264,8 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
             v = ll.get(r["name"])
             if values and v is not None and not pd.isna(v):
                 txt += f"\n{v:.1f} %"
+            if values and p_line is not None and not pd.isna(p_line):
+                txt += f"\n{_fmt_p(abs(p_line))}"
             p = mid + n * 0.6 * r_bus
             _label(ax, *p, txt, fs_small, ha="left" if n[0] > 0.3 else "right" if n[0] < -0.3 else "center",
                    va="top" if n[1] < -0.3 else "bottom" if n[1] > 0.3 else "center")
@@ -244,6 +285,9 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
         color = _loading_color(tl.get(r["name"]))
         for c in (c1, c2):
             ax.add_patch(Circle(c, r_tr, facecolor="none", edgecolor=color, lw=2.6, zorder=5))
+        p_tr = tpf.get(r["name"])
+        if arrows:                                   # Pfeil auf dem US-seitigen Stück (OS-Seite trägt den Schalter)
+            _flow_arrow(ax, c2 + u * r_tr, b, p_tr, r_bus, size=0.8)
         if labels:
             n = np.array([-u[1], u[0]])
             if n[0] < 0:
@@ -252,6 +296,8 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
             v = tl.get(r["name"])
             if values and v is not None and not pd.isna(v):
                 txt += f"\n{v:.1f} %"
+            if values and p_tr is not None and not pd.isna(p_tr):
+                txt += f"\n{_fmt_p(abs(p_tr))}"
             p = mid + n * 2.0 * r_tr
             _label(ax, *p, txt, fs_small, ha="left" if n[0] >= 0 else "right", va="center")
 
@@ -411,9 +457,10 @@ def _legend(ax):
         Line2D([], [], marker="s", ls="", markerfacecolor="black", markeredgecolor="black", label="Schalter geschlossen"),
         Line2D([], [], marker="s", ls="", markerfacecolor="white", markeredgecolor="black", label="Schalter offen"),
         Line2D([], [], marker=r"$\rightarrow$", ls="", color="black", markersize=14, label="Last"),
+        Line2D([], [], marker=">", ls="-", color="black", markersize=6, lw=1, label="Richtung Wirkleistung"),
         Line2D([], [], marker=r"$\mathbf{G}$", ls="", color="black", markersize=8, label="Erzeuger"),
     ]
-    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.01), ncol=7, fontsize=8, frameon=False)
+    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.01), ncol=8, fontsize=8, frameon=False)
 
 
 # ---------------------------------------------------------------------------
@@ -451,18 +498,20 @@ def resolve_time(results, time, months=None, net=None):
     return t, None
 
 
-def plot_time(sim, time=None, months=None, title=None, labels=True, values=True, elements=True):
+def plot_time(sim, time=None, months=None, title=None, labels=True, values=True, elements=True, arrows=True):
     """Netzplan einer Simulation zu einem Zeitpunkt (siehe resolve_time)."""
     res = sim.results
     t, reason = resolve_time(res, time, months, sim.net)
     label = title or f"Netzplan – Simulation '{sim.name}'"
     sub = f"{pd.Timestamp(t):%a %d.%m.%Y %H:%M}" + (f" ({reason})" if reason else "")
+    row = lambda df: df.loc[t] if len(df.columns) else None
     return draw(sim.net, res.vm_pu.loc[t], res.line_loading.loc[t], res.trafo_loading.loc[t],
-                res.load_p_mw.loc[t], res.sgen_p_mw.loc[t],
-                title=f"{label}\n{sub}", labels=labels, values=values, elements=elements), t
+                res.load_p_mw.loc[t], res.sgen_p_mw.loc[t], row(res.line_p_mw), row(res.trafo_p_mw),
+                title=f"{label}\n{sub}", labels=labels, values=values, elements=elements, arrows=arrows), t
 
 
-def plot_static(net, title="Netzplan – statischer Lastfluss", labels=True, values=True, elements=True):
+def plot_static(net, title="Netzplan – statischer Lastfluss", labels=True, values=True, elements=True,
+                arrows=True, show=True, figsize=(14, 12)):
     """Netzplan mit den Ergebnissen von pp.runpp(net)."""
     names = lambda t: net[t]["name"]
     vm = pd.Series(net.res_bus.vm_pu.to_numpy(), index=names("bus"))
@@ -470,6 +519,10 @@ def plot_static(net, title="Netzplan – statischer Lastfluss", labels=True, val
     tl = pd.Series(net.res_trafo.loading_percent.to_numpy(), index=names("trafo")) if len(net.trafo) else None
     lp = pd.Series(net.res_load.p_mw.to_numpy(), index=names("load")) if len(net.load) else None
     gp = pd.Series(net.res_sgen.p_mw.to_numpy(), index=names("sgen")) if len(net.sgen) else None
-    fig = draw(net, vm, ll, tl, lp, gp, title=title, labels=labels, values=values, elements=elements)
-    plt.show()
+    lpf = pd.Series(net.res_line.p_from_mw.to_numpy(), index=names("line")) if len(net.line) else None
+    tpf = pd.Series(net.res_trafo.p_hv_mw.to_numpy(), index=names("trafo")) if len(net.trafo) else None
+    fig = draw(net, vm, ll, tl, lp, gp, lpf, tpf, title=title, labels=labels, values=values,
+               elements=elements, arrows=arrows, figsize=figsize)
+    if show:
+        plt.show()
     return fig

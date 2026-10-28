@@ -51,6 +51,7 @@ class Diagram(Enum):
     LINE_LOADING = "Leitungsauslastung"
     TRAFO_LOADING = "Trafoauslastung"
     TRAFO_POWER = "Trafoleistung"
+    LINE_POWER = "Wirkleistungsfluss Leitungen"
     ELEMENT_POWER = "Leistung von Lasten und Erzeugern"
     VOLTAGE_PROFILE = "Spannungsverlauf entlang eines Pfades"
     POWER_FLOW = "Leistungsfluss"

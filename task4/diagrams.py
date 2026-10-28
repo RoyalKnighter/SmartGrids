@@ -22,8 +22,8 @@ _PROFILE_LABEL = {"HAUSHALT": "Haushalt", "GEWERBE": "Gewerbe", "LANDWIRTSCHAFT"
                   "HAUSHALT_PV": "Haushalt mit PV", "HAUSHALT_PV_SPEICHER": "Haushalt mit PV und Speicher",
                   "PV": "PV", "WIND": "Wind", "FEST": "konstant"}
 
-TABLES = ["vm_pu", "va_degree", "line_loading", "line_i_ka", "trafo_loading", "trafo_p_mw",
-          "ext_grid_p_mw", "load_p_mw", "sgen_p_mw"]
+TABLES = ["vm_pu", "va_degree", "line_loading", "line_i_ka", "line_p_mw", "line_pl_mw",
+          "trafo_loading", "trafo_p_mw", "trafo_pl_mw", "ext_grid_p_mw", "load_p_mw", "sgen_p_mw"]
 
 
 # ---------------------------------------------------------------------------
@@ -42,8 +42,7 @@ class Results:
         months = [Month[m].label for m in dict.fromkeys(self.info["month"])]
         return (f"Ergebnisse: {len(self.info)} Zeitschritte ({int(self.converged.sum())} konvergiert), "
                 f"Monate: {', '.join(months)}\n"
-                f"Tabellen: vm_pu, va_degree, line_loading, line_i_ka, trafo_loading, trafo_p_mw, "
-                f"ext_grid_p_mw, load_p_mw, sgen_p_mw, element_p_mw, info")
+                f"Tabellen: {', '.join(TABLES)}, element_p_mw, info")
 
     @property
     def element_p_mw(self):
@@ -204,6 +203,8 @@ def _source(results, diagram, net=None):
         return results.line_loading, "Auslastung [%]", [100], "Leitung"
     if diagram == Diagram.TRAFO_LOADING:
         return results.trafo_loading, "Auslastung [%]", [100], "Trafo"
+    if diagram == Diagram.LINE_POWER:
+        return results.line_p_mw, "Wirkleistung am Leitungsanfang [MW] (< 0: Fluss nach from_bus)", [0], "Leitung"
     if diagram == Diagram.TRAFO_POWER:
         return results.trafo_p_mw, "Wirkleistung OS [MW] (< 0: Rückspeisung)", [0], "Trafo"
     if diagram == Diagram.ELEMENT_POWER:
@@ -244,7 +245,7 @@ def _limit_lines(ax, diagram, limits, sim_settings):
             ax.axhline(v, color="red", ls="--", lw=1)
     elif diagram in (Diagram.LINE_LOADING, Diagram.TRAFO_LOADING):
         ax.axhline(100, color="red", ls="--", lw=1)
-    elif diagram == Diagram.TRAFO_POWER:
+    elif diagram in (Diagram.TRAFO_POWER, Diagram.LINE_POWER):
         ax.axhline(0, color="black", lw=0.8)
 
 
@@ -500,7 +501,7 @@ def _power_flow_weeks(sim, df, cols, months, label, markers, out_dir, show):
     return figs
 
 
-def _network(sim, months, time, title, labels, out_dir, show, show_elements=True):
+def _network(sim, months, time, title, labels, out_dir, show, show_elements=True, arrows=True):
     """
     Netzplan zu einem oder mehreren Zeitpunkten.
     time = Zeitpunkt, Stichwort ("min", "max", "max_loading", "max_trafo") oder Liste davon.

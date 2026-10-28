@@ -1,0 +1,68 @@
+{
+  "name": "w4_baseline_101",
+  "meta": {
+    "created": "2026-10-28T15:36:32",
+    "modified": "2026-10-28T15:36:33",
+    "parent": "w4_baseline",
+    "last_run": "2026-10-28T14:47:00",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-10-28T15:36:33",
+      "aktion": "Parameter geändert",
+      "element": "S1",
+      "tabelle": "switch",
+      "parameter": "closed",
+      "alt": false,
+      "neu": true
+    },
+    {
+      "zeit": "2026-10-28T15:36:33",
+      "aktion": "Parameter geändert",
+      "element": "S3",
+      "tabelle": "switch",
+      "parameter": "closed",
+      "alt": false,
+      "neu": true
+    }
+  ]
+}

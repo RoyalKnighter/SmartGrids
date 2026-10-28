@@ -61,6 +61,16 @@ PROFILE_COLUMNS = {"load": ["profile", "annual_kwh", "cos_phi"],
 # Spalten, die bei den Änderungsanzeigen ignoriert werden
 IGNORE_COLUMNS = {"geo"}
 
+# Nur rechnen, wenn sich etwas geändert hat:
+#   sim.ONLY_RUN_IF_CHANGED = True
+# runSimulation() vergleicht dann einen Fingerabdruck aus Netz, Einstellungen, Eingangsdaten und
+# Programmversion mit dem des letzten gespeicherten Laufs dieser Simulation. Stimmt er überein,
+# werden die gespeicherten Ergebnisse geladen, statt neu zu rechnen. runSimulation(force=True)
+# rechnet immer.
+ONLY_RUN_IF_CHANGED = False
+CACHE_VERSION = "2"          # erhöhen, wenn sich Rechnung oder Ergebnisformat ändern
+FINGERPRINT_FILE = "fingerprint.txt"
+
 DEFAULT_SETTINGS = {
     "months": [m.name for m in Month],
     "v_min": 0.90,
@@ -72,6 +82,51 @@ DEFAULT_SETTINGS = {
 # ---------------------------------------------------------------------------
 # Hilfsfunktionen
 # ---------------------------------------------------------------------------
+
+def _data_fingerprint():
+    """Hash der Eingangsdaten (Lastprofile, Wetter) im Ordner data."""
+    import hashlib
+    h = hashlib.sha256()
+    for f in sorted((BASE_DIR / "data").glob("*.csv")):
+        h.update(f.name.encode())
+        h.update(f.read_bytes())
+    return h.hexdigest()
+
+
+_DATA_FP = None
+
+
+def _fingerprint(net, settings):
+    """Fingerabdruck einer Rechnung: Netz (ohne Ergebnisse und Geodaten), Einstellungen, Daten, Version."""
+    import hashlib
+    global _DATA_FP
+    if _DATA_FP is None:
+        _DATA_FP = _data_fingerprint()
+    h = hashlib.sha256()
+    h.update(CACHE_VERSION.encode())
+    h.update(_DATA_FP.encode())
+    h.update(json.dumps(_jsonable(settings), sort_keys=True, default=str).encode())
+    for key in sorted(net.keys()):
+        df = net[key]
+        if key.startswith(("res_", "_")) or not isinstance(df, pd.DataFrame) or not len(df):
+            continue
+        df = df.drop(columns=[c for c in ("geo",) if c in df.columns])
+        h.update(key.encode())
+        h.update(df.to_json(orient="split", double_precision=10, default_handler=str).encode())
+    return h.hexdigest()
+
+
+def _clear_folder(folder, keep_results):
+    """Simulationsordner leeren; mit keep_results bleiben Ergebnisse und Fingerabdruck erhalten."""
+    if not folder.exists():
+        return
+    if not keep_results:
+        shutil.rmtree(folder)
+        return
+    for item in folder.iterdir():
+        if item.name in ("results", FINGERPRINT_FILE):
+            continue
+        shutil.rmtree(item) if item.is_dir() else item.unlink()
 
 def _now():
     return dt.datetime.now().isoformat(timespec="seconds")
@@ -195,8 +250,7 @@ def init(name, net=None, overwrite=False, assignProfiles=False):
     if folder.exists() and not overwrite:
         raise FileExistsError(f"Simulation '{name}' existiert bereits. "
                               f"sim.loadSimulation('{name}') zum Laden oder overwrite=True zum Überschreiben.")
-    if folder.exists():
-        shutil.rmtree(folder)
+    _clear_folder(folder, keep_results=ONLY_RUN_IF_CHANGED)
     net = pp.create_empty_network() if net is None else copy.deepcopy(net)
     renamed = _ensure_names(net)
     _ensure_profile_columns(net)
@@ -223,7 +277,9 @@ def loadSimulation(name):
     baseline = pp.from_json(str(folder / "baseline.json"))
     for n in (net, baseline):
         _ensure_profile_columns(n)
-    results = diagrams.Results.load(folder / "results") if (folder / "results").exists() else None
+    results = None
+    if (folder / "results").exists() and meta["meta"].get("results_status", "keine") != "keine":
+        results = diagrams.Results.load(folder / "results")
     s = Simulation(name, net, baseline=baseline, settings=meta["settings"], log=meta["log"],
                    meta=meta["meta"], baseline_settings=meta.get("baseline_settings"), results=results)
     return s
@@ -775,8 +831,8 @@ class Simulation:
         return pd.DataFrame(rows, columns=["Element", "Typ", "Parameter", "alt", "neu"])
 
     # ------------------------------------------------------------------ Speichern / Kopieren
-    def save(self):
-        """Simulation speichern (Netz, Baseline, Einstellungen, Protokoll, Ergebnisse)."""
+    def save(self, results=True):
+        """Simulation speichern (Netz, Baseline, Einstellungen, Protokoll und, mit results=True, Ergebnisse)."""
         folder = SIM_DIR / self.name
         folder.mkdir(parents=True, exist_ok=True)
         pp.to_json(self.net, str(folder / "net.json"))
@@ -785,7 +841,7 @@ class Simulation:
                 "baseline_settings": _jsonable(self.baseline_settings), "log": self.log}
         (folder / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False, default=str),
                                           encoding="utf-8")
-        if self.results is not None:
+        if results and self.results is not None:
             self.results.save(folder / "results")
         return folder
 
@@ -797,8 +853,7 @@ class Simulation:
         _check_name(new_name)
         if (SIM_DIR / new_name).exists() and not overwrite:
             raise FileExistsError(f"Simulation '{new_name}' existiert bereits (overwrite=True zum Überschreiben).")
-        if (SIM_DIR / new_name).exists():
-            shutil.rmtree(SIM_DIR / new_name)
+        _clear_folder(SIM_DIR / new_name, keep_results=ONLY_RUN_IF_CHANGED)
         now = _now()
         s = Simulation(new_name, copy.deepcopy(self.net), baseline=copy.deepcopy(self.net),
                        settings=copy.deepcopy(self.settings), baseline_settings=copy.deepcopy(self.settings),
@@ -874,19 +929,41 @@ class Simulation:
             return sched
         return {i: per_month(tap) for i in with_tap}
 
-    def runSimulation(self, months=None, tap=None, save=True, verbose=True):
+    def runSimulation(self, months=None, tap=None, save=True, verbose=True, force=False):
         """
         Alle Zeitschritte rechnen (Standard: 12 typische Wochen, stündlich) und speichern.
 
         months : Monat oder Liste von Monaten (überschreibt die Einstellung 'months')
         tap    : Stufenschalter: int (alle Trafos mit Stufenschalter), {Month: int},
                  {"Trafoname": int} oder {"Trafoname": {Month: int}}
+        force  : immer rechnen, auch wenn sim.ONLY_RUN_IF_CHANGED = True ist und sich nichts
+                 geändert hat
         """
         if months is not None:
             self.changeSetting("months", months)
         if tap is not None:
             self.changeSetting("tap", tap)
         self._check()
+        fingerprint = _fingerprint(self.net, self.settings)
+        folder = SIM_DIR / self.name
+        if ONLY_RUN_IF_CHANGED and not force and save:
+            fp_file = folder / FINGERPRINT_FILE
+            stored = {}
+            if fp_file.exists():
+                try:
+                    stored = json.loads(fp_file.read_text())
+                except ValueError:
+                    stored = {}
+            if stored.get("fingerprint") == fingerprint and (folder / "results").exists():
+                self.results = diagrams.Results.load(folder / "results")
+                self.meta["results_status"] = "aktuell"
+                self.meta["last_run"] = stored.get("last_run")
+                self.save(results=False)
+                if verbose:
+                    print(f"Simulation '{self.name}': unverändert seit dem Lauf vom {self.meta.get('last_run')} "
+                          f"– gespeicherte Ergebnisse geladen ({int(self.results.converged.sum())} von "
+                          f"{len(self.results.info)} Lastflüssen konvergiert).")
+                return self.results
         months = [Month[m] for m in self.settings["months"]]
         profile_table = tsm.build_profile_table(months)
         schedule = self._tap_schedule(self.settings["tap"])
@@ -901,6 +978,9 @@ class Simulation:
         va = np.full((T, len(bus_idx)), np.nan)
         line_load = np.full((T, len(line_idx)), np.nan)
         line_i = np.full((T, len(line_idx)), np.nan)
+        line_p = np.full((T, len(line_idx)), np.nan)
+        line_pl = np.full((T, len(line_idx)), np.nan)
+        trafo_pl = np.full((T, len(trafo_idx)), np.nan)
         trafo_load = np.full((T, len(trafo_idx)), np.nan)
         trafo_p = np.full((T, len(trafo_idx)), np.nan)
         ext_p = np.full(T, np.nan)
@@ -927,9 +1007,12 @@ class Simulation:
                 if len(line_idx):
                     line_load[k] = net.res_line.loading_percent.reindex(line_idx).to_numpy()
                     line_i[k] = net.res_line.i_ka.reindex(line_idx).to_numpy()
+                    line_p[k] = net.res_line.p_from_mw.reindex(line_idx).to_numpy()
+                    line_pl[k] = net.res_line.pl_mw.reindex(line_idx).to_numpy()
                 if len(trafo_idx):
                     trafo_load[k] = net.res_trafo.loading_percent.reindex(trafo_idx).to_numpy()
                     trafo_p[k] = net.res_trafo.p_hv_mw.reindex(trafo_idx).to_numpy()
+                    trafo_pl[k] = net.res_trafo.pl_mw.reindex(trafo_idx).to_numpy()
                 ext_p[k] = net.res_ext_grid.p_mw.sum()
             except pp.LoadflowNotConverged:
                 init = "auto"
@@ -949,6 +1032,9 @@ class Simulation:
             va_degree=pd.DataFrame(va, index=index, columns=names("bus", bus_idx)),
             line_loading=pd.DataFrame(line_load, index=index, columns=names("line", line_idx)),
             line_i_ka=pd.DataFrame(line_i, index=index, columns=names("line", line_idx)),
+            line_p_mw=pd.DataFrame(line_p, index=index, columns=names("line", line_idx)),
+            line_pl_mw=pd.DataFrame(line_pl, index=index, columns=names("line", line_idx)),
+            trafo_pl_mw=pd.DataFrame(trafo_pl, index=index, columns=names("trafo", trafo_idx)),
             trafo_loading=pd.DataFrame(trafo_load, index=index, columns=names("trafo", trafo_idx)),
             trafo_p_mw=pd.DataFrame(trafo_p, index=index, columns=names("trafo", trafo_idx)),
             ext_grid_p_mw=pd.DataFrame({"ext_grid_p_mw": ext_p}, index=index),
@@ -963,6 +1049,8 @@ class Simulation:
                   f"nicht konvergiert: {bad}" + (" (als NaN gespeichert)" if bad else ""))
         if save:
             self.save()
+            (folder / FINGERPRINT_FILE).write_text(json.dumps({"fingerprint": fingerprint,
+                                                               "last_run": self.meta["last_run"]}))
         return self.results
 
     # ------------------------------------------------------------------ Auswertung
