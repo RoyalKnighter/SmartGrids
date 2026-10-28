@@ -1,0 +1,68 @@
+{
+  "name": "cigre_mehr_pv",
+  "meta": {
+    "created": "2026-10-25T15:27:14",
+    "modified": "2026-10-25T15:27:14",
+    "parent": "cigre_basis",
+    "last_run": "2026-10-25T15:27:52",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-10-25T15:27:14",
+      "aktion": "Element hinzugefügt",
+      "element": "PV-Park",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-25T15:27:14",
+      "aktion": "Parameter geändert",
+      "element": "PV-Freifläche",
+      "tabelle": "sgen",
+      "parameter": "kwp",
+      "alt": 2000.0,
+      "neu": 4000.0
+    }
+  ]
+}
