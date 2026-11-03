@@ -1,0 +1,1253 @@
+{
+  "name": "w4_lv_Bus9",
+  "meta": {
+    "created": "2026-10-29T15:50:43",
+    "modified": "2026-10-29T15:50:44",
+    "parent": "w4_baseline",
+    "last_run": "2026-10-29T15:51:38",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Netz angehängt",
+      "element": "101 Elemente",
+      "tabelle": null,
+      "parameter": "at_bus",
+      "alt": null,
+      "neu": "Bus 9"
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C0",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C1",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C10",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C11",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C12",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C13",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C14",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C15",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C16",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C17",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C18",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C19",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C2",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C20",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C3",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C4",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C5",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C6",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C7",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C8",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus C9",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus I0",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus I1",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus I2",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R0",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R1",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R10",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R11",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R12",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R13",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R14",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R15",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R16",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R17",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R18",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R2",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R3",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R4",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R5",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R6",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R7",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R8",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Bus R9",
+      "tabelle": "bus",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C1-C2",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C10-C11",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C10-C14",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C11-C12",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C11-C13",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C15-C16",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C15-C17",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C16-C18",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C2-C3",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C3-C10",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C3-C4",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C4-C5",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C5-C15",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C5-C6",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C6-C7",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C7-C8",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C8-C19",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C8-C9",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line C9-C20",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line I1-I2",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R1-R2",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R10-R18",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R12-R13",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R13-R14",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R14-R15",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R2-R3",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R3-R11",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R3-R4",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R4-R12",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R4-R5",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R5-R6",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R6-R16",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R6-R7",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R7-R8",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R8-R9",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R9-R10",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Line R9-R17",
+      "tabelle": "line",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C1",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C12",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C13",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C14",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C17",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C18",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C19",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load C20",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load I2",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R1",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R11",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R15",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R16",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R17",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R18",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV S1",
+      "tabelle": "switch",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV S2",
+      "tabelle": "switch",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV S3",
+      "tabelle": "switch",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Trafo C0-C1",
+      "tabelle": "trafo",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Trafo I0-I1",
+      "tabelle": "trafo",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Trafo R0-R1",
+      "tabelle": "trafo",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load R1",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.19
+      },
+      "neu": {
+        "profile": "HAUSHALT",
+        "annual_kwh": 838335.5436380864,
+        "cos_phi": 0.9499999999762452,
+        "p_mw": 0.19
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load R11",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.01425
+      },
+      "neu": {
+        "profile": "HAUSHALT",
+        "annual_kwh": 62875.16577285648,
+        "cos_phi": 0.9500000098641583,
+        "p_mw": 0.01425
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load R15",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.0494
+      },
+      "neu": {
+        "profile": "HAUSHALT",
+        "annual_kwh": 217967.24134590247,
+        "cos_phi": 0.9499999988353321,
+        "p_mw": 0.0494
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load R16",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.05225
+      },
+      "neu": {
+        "profile": "HAUSHALT",
+        "annual_kwh": 230542.27450047375,
+        "cos_phi": 0.9500000026729489,
+        "p_mw": 0.05225
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load R17",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.03325
+      },
+      "neu": {
+        "profile": "HAUSHALT",
+        "annual_kwh": 146708.72013666513,
+        "cos_phi": 0.9500000042139224,
+        "p_mw": 0.03325
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load R18",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.04465
+      },
+      "neu": {
+        "profile": "HAUSHALT",
+        "annual_kwh": 197008.85275495032,
+        "cos_phi": 0.9500000018696755,
+        "p_mw": 0.04465
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load I2",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.085
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 312364.4889349474,
+        "cos_phi": 0.8499999989444547,
+        "p_mw": 0.085
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C1",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.108
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 396886.6447644037,
+        "cos_phi": 0.9000000010542697,
+        "p_mw": 0.108
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C12",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.018
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 66147.77412740061,
+        "cos_phi": 0.8999999977850954,
+        "p_mw": 0.018
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C13",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.018
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 66147.77412740061,
+        "cos_phi": 0.8999999977850954,
+        "p_mw": 0.018
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C14",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.0225
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 82684.71765925077,
+        "cos_phi": 0.9000000056311135,
+        "p_mw": 0.0225
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C17",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.0225
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 82684.71765925077,
+        "cos_phi": 0.9000000056311135,
+        "p_mw": 0.0225
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C18",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.0072
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 26459.109650960247,
+        "cos_phi": 0.9000000075926181,
+        "p_mw": 0.0072
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C19",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.0144
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 52918.21930192049,
+        "cos_phi": 0.9000000075926181,
+        "p_mw": 0.0144
+      }
+    },
+    {
+      "zeit": "2026-10-29T15:50:44",
+      "aktion": "Profil zugeordnet",
+      "element": "LV Load C20",
+      "tabelle": "load",
+      "parameter": "profile",
+      "alt": {
+        "profile": "FEST",
+        "annual_kwh": null,
+        "cos_phi": null,
+        "p_mw": 0.0072
+      },
+      "neu": {
+        "profile": "GEWERBE",
+        "annual_kwh": 26459.109650960247,
+        "cos_phi": 0.9000000075926181,
+        "p_mw": 0.0072
+      }
+    }
+  ]
+}

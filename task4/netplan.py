@@ -203,7 +203,7 @@ def _label(ax, x, y, text, fontsize, ha="left", va="bottom", color="black"):
 
 def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None, sgen_p_mw=None,
          line_p_mw=None, trafo_p_mw=None, title=None, labels=True, values=True, elements=True,
-         arrows=True, v_range=V_RANGE, ax=None, figsize=(14, 12)):
+         arrows=True, v_range=V_RANGE, ax=None, figsize=None):
     """
     Netzplan zeichnen.
 
@@ -221,6 +221,11 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
     pts = np.array(list(pos.values()))
     extent = max(np.ptp(pts[:, 0]), np.ptp(pts[:, 1]), 1.0)
     r_bus = 0.017 * extent                          # Radius der Buskreise
+    seg = [np.hypot(*(np.array(pos[a]) - np.array(pos[b]))) for a, b in
+           list(zip(net.line.from_bus, net.line.to_bus)) + list(zip(net.trafo.hv_bus, net.trafo.lv_bus))]
+    seg = [d for d in seg if d > 1e-9]
+    if seg:                                         # dichte Netze (z. B. Ortsnetz): Kreise nicht überlappen
+        r_bus = min(r_bus, 0.28 * min(seg))
     r_tr = 0.75 * r_bus                             # Radius der Trafokreise
     sw = 0.9 * r_bus                                # Kantenlänge der Schalter
     fs = 8 if labels else 0
@@ -236,6 +241,9 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
     tpf = _values(trafo_p_mw, net.trafo["name"]) if len(net.trafo) else {}
 
     if ax is None:
+        if figsize is None:                          # Größe nach dem Seitenverhältnis des Netzes
+            ratio = np.ptp(pts[:, 0]) / max(np.ptp(pts[:, 1]), 1e-9)
+            figsize = (float(np.clip(11 * ratio + 4, 12, 28)), 12)
         fig, ax = plt.subplots(figsize=figsize)
     else:
         fig = ax.figure
@@ -312,7 +320,7 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
             other = b if np.allclose(a, bus) else a
         elif r.et == "b" and r.element in pos:
             other = np.array(pos[r.element])
-            ax.plot(*zip(bus, other), color="gray", lw=1.5, zorder=2)
+            ax.plot(*zip(bus, other), color="gray", lw=1.2, ls="--", zorder=1.5)
         else:
             continue
         d = other - bus
@@ -373,7 +381,7 @@ def draw(net, vm_pu=None, line_loading=None, trafo_loading=None, load_p_mw=None,
         x, y = pos[idx]
         v = vm.get(r["name"])
         ax.add_patch(Circle((x, y), r_bus, facecolor=_voltage_color(v, v_range), edgecolor="black",
-                            lw=1.0, zorder=7, alpha=1 if r.in_service else 0.4))
+                            lw=1.0, zorder=9, alpha=1 if r.in_service else 0.4))
         corner = free_corner(idx)
         if labels:
             txt = r["name"]
@@ -511,7 +519,7 @@ def plot_time(sim, time=None, months=None, title=None, labels=True, values=True,
 
 
 def plot_static(net, title="Netzplan – statischer Lastfluss", labels=True, values=True, elements=True,
-                arrows=True, show=True, figsize=(14, 12)):
+                arrows=True, show=True, figsize=None):
     """Netzplan mit den Ergebnissen von pp.runpp(net)."""
     names = lambda t: net[t]["name"]
     vm = pd.Series(net.res_bus.vm_pu.to_numpy(), index=names("bus"))

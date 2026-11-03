@@ -260,3 +260,38 @@ def heatmap(df, title, cbar_label, cmap="viridis", vmin=None, vmax=None, fmt="{:
     ax.set_title(title)
     fig.tight_layout()
     return fig
+
+
+# ---------------------------------------------------------------------------
+# Monatstabellen
+# ---------------------------------------------------------------------------
+
+def monatstabelle(s, groesse, stat="max", elemente=None):
+    """
+    Monatstabelle (Elemente × Monate) einer Simulation als DataFrame.
+    groesse: "Spannung", "Winkel", "Leitung" oder "Trafo"; stat: "max", "min" oder "mean".
+    """
+    from profiles import Month
+    attr = {"Spannung": "vm_pu", "Winkel": "va_degree", "Leitung": "line_loading", "Trafo": "trafo_loading"}[groesse]
+    r = s.results
+    df = getattr(r, attr)[r.converged]
+    if elemente is not None:
+        df = df[elemente]
+    monat = r.info.loc[r.converged, "month"].map(lambda m: Month[m].label)
+    order = [m.label for m in Month if m.label in set(monat)]
+    t = df.groupby(monat).agg(stat).T[order]
+    einheit = {"Spannung": "pu", "Winkel": "°", "Leitung": "%", "Trafo": "%"}[groesse]
+    t.index.name = f"{groesse} {stat} [{einheit}]"
+    return t
+
+
+def stunden_je_bus(s, grenzen=(0.90, 0.95), busse=None):
+    """Anzahl Stunden je Bus mit Spannung unter den Grenzen (Zeilen = Busse)."""
+    r = s.results
+    vm = r.vm_pu[r.converged]
+    if busse is not None:
+        vm = vm[busse]
+    out = pd.DataFrame({f"Stunden U < {g:.2f}".replace(".", ","): (vm < g).sum() for g in grenzen})
+    out["U min [pu]"] = vm.min()
+    out["Zeitpunkt U min"] = vm.idxmin().dt.strftime("%a %d.%m. %H:%M")
+    return out
