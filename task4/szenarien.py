@@ -166,11 +166,12 @@ def bilanzen(ergebnisse):
 # Zeitreihen
 # ---------------------------------------------------------------------------
 
-def zeitreihe_alle(basis, prefix, keys=KEYS):
+def zeitreihe_alle(basis, prefix, keys=KEYS, **run_kwargs):
     """
     Für jeden Schaltzustand eine Kopie der Simulation `basis` anlegen, die Schalter setzen und
     rechnen. Alle Kopien starten vom selben Stand (Baseline = Stand von `basis`).
     Mit sim.ONLY_RUN_IF_CHANGED = True wird nur neu gerechnet, wenn sich etwas geändert hat.
+    run_kwargs werden an runSimulation weitergegeben (z. B. controllers=[...]).
     Rückgabe: {key: Simulation}
     """
     sims = {}
@@ -179,7 +180,7 @@ def zeitreihe_alle(basis, prefix, keys=KEYS):
         for sw, closed in zustand(key).items():
             if bool(s.net.switch.loc[s.net.switch["name"] == sw, "closed"].iloc[0]) != closed:
                 s.changeParameter(sw, "closed", closed)
-        s.runSimulation()
+        s.runSimulation(**run_kwargs)
         sims[key] = s
     return sims
 

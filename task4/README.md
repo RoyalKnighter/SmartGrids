@@ -41,6 +41,7 @@ sim1 = sim.loadSimulation("cigre_basis")
 | `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25, L25, P25, S25) und Wetter/PV/Wind (aus Task 2) |
 | `plots.py` | Zeitachse der Diagramme (6-h-Takt, Tageslinien, Datum) |
 | `lvnetz.py` | CIGRE-LV-Ortsnetz mit Grenzströmen, Anschluss an das MV-Netz, Kennwerte MS/NS (Task 4, Teil 2) |
+| `regelung.py` | Regler für die Zeitreihe: `TapRegler` (regelbarer Ortsnetztrafo), `SchaltPlan` (Backup-Plan mit Trennschaltern), `regle_statisch`, `schaltvorgaenge` (Task 4, Teil 3b) |
 | `auslegung.py` | Spitzenwerte je Element und passende pandapower-Standardtrafos/-leitungen (Task 4, Teil 3) |
 | `szenarien.py` | Schalterstellungen S1–S3 (8 Zustände), statische Lastflüsse aller Zustände, Zeitreihen aller Zustände, Vergleichstabellen und Heatmaps (Task 4) |
 | `data/` | BDEW-Profile und Wetterwochen |
@@ -120,8 +121,10 @@ Jede Last und jeder Erzeuger hat ein Profil. Es bestimmt den Leistungsverlauf ü
 ### Rechnen
 
 ```python
-sim1.runSimulation(months=None, tap=None, force=False)
+sim1.runSimulation(months=None, tap=None, force=False, controllers=None, max_iter=10)
 ```
+
+**Regler (`controllers`):** Liste von Objekten aus `regelung.py`. Nach jedem Lastfluss prüft jeder Regler das Ergebnis (`step(net)`); verstellt er etwas, wird dieselbe Stunde neu gerechnet (höchstens `max_iter`-mal). Der Zustand wird in die nächste Stunde übernommen. Stufenstellungen und Schalterzustände je Stunde stehen in `results.tap_pos` und `results.switch_closed`.
 
 **Nur rechnen, wenn sich etwas geändert hat:**
 

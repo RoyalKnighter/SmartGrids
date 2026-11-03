@@ -25,7 +25,7 @@ _PROFILE_LABEL = {"HAUSHALT": "Haushalt", "GEWERBE": "Gewerbe", "LANDWIRTSCHAFT"
 TABLES = ["vm_pu", "va_degree", "line_loading", "line_i_ka", "line_p_mw", "line_pl_mw",
           "trafo_loading", "trafo_p_mw", "trafo_pl_mw", "ext_grid_p_mw", "load_p_mw", "sgen_p_mw",
           "line_q_mvar", "trafo_q_mvar", "trafo_i_hv_ka", "trafo_i_lv_ka", "bus_p_mw", "bus_q_mvar",
-          "ext_grid_q_mvar", "load_q_mvar", "sgen_q_mvar"]
+          "ext_grid_q_mvar", "load_q_mvar", "sgen_q_mvar", "tap_pos", "switch_closed"]
 
 # Größen je Element für ACTIVE_POWER, APPARENT_POWER und CURRENT
 QUANTITY = {"P": ("Wirkleistung [MW]", "MW"), "S": ("Scheinleistung [MVA]", "MVA"), "I": ("Strom [A]", "A")}

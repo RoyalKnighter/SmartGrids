@@ -68,7 +68,7 @@ IGNORE_COLUMNS = {"geo"}
 # werden die gespeicherten Ergebnisse geladen, statt neu zu rechnen. runSimulation(force=True)
 # rechnet immer.
 ONLY_RUN_IF_CHANGED = False
-CACHE_VERSION = "3"          # erhöhen, wenn sich Rechnung oder Ergebnisformat ändern
+CACHE_VERSION = "4"          # erhöhen, wenn sich Rechnung oder Ergebnisformat ändern
 FINGERPRINT_FILE = "fingerprint.txt"
 
 DEFAULT_SETTINGS = {
@@ -929,7 +929,8 @@ class Simulation:
             return sched
         return {i: per_month(tap) for i in with_tap}
 
-    def runSimulation(self, months=None, tap=None, save=True, verbose=True, force=False):
+    def runSimulation(self, months=None, tap=None, save=True, verbose=True, force=False, controllers=None,
+                      max_iter=10):
         """
         Alle Zeitschritte rechnen (Standard: 12 typische Wochen, stündlich) und speichern.
 
@@ -938,13 +939,23 @@ class Simulation:
                  {"Trafoname": int} oder {"Trafoname": {Month: int}}
         force  : immer rechnen, auch wenn sim.ONLY_RUN_IF_CHANGED = True ist und sich nichts
                  geändert hat
+        controllers : Liste von Reglern (siehe regelung.py). Nach jedem Lastfluss prüft jeder Regler
+                 das Ergebnis und verstellt ggf. Stufenschalter oder Schalter; dann wird dieselbe
+                 Stunde erneut gerechnet (höchstens max_iter-mal). Der Zustand (Stufenstellung,
+                 Schalter) wird in die nächste Stunde übernommen. Stufenstellungen und
+                 Schalterzustände je Stunde stehen danach in results.tap_pos und results.switch_closed.
         """
+        controllers = list(controllers or [])
         if months is not None:
             self.changeSetting("months", months)
         if tap is not None:
             self.changeSetting("tap", tap)
         self._check()
-        fingerprint = _fingerprint(self.net, self.settings)
+        fp_settings = dict(self.settings)
+        if controllers:
+            fp_settings["controllers"] = [c.config() for c in controllers]
+            fp_settings["max_iter"] = max_iter
+        fingerprint = _fingerprint(self.net, fp_settings)
         folder = SIM_DIR / self.name
         if ONLY_RUN_IF_CHANGED and not force and save:
             fp_file = folder / FINGERPRINT_FILE
@@ -992,6 +1003,12 @@ class Simulation:
         trafo_p = np.full((T, len(trafo_idx)), np.nan)
         ext_p = np.full(T, np.nan)
         converged = np.zeros(T, dtype=bool)
+        taps = np.full((T, len(trafo_idx)), np.nan)
+        sw_idx = net.switch.index
+        sw_closed = np.zeros((T, len(sw_idx)), dtype=bool)
+        iterations = np.zeros(T, dtype=int)
+        for c in controllers:
+            c.reset(net)
 
         t0 = time.time()
         init = "auto"
@@ -1008,6 +1025,14 @@ class Simulation:
             try:
                 pp.runpp(net, init=init)
                 init = "results"
+                for it in range(max_iter):                    # Regler: dieselbe Stunde nachrechnen
+                    if not controllers:
+                        break
+                    changed = [c.step(net) for c in controllers]
+                    if not any(changed):
+                        break
+                    iterations[k] += 1
+                    pp.runpp(net, init="auto")
                 converged[k] = True
                 vm[k] = net.res_bus.vm_pu.reindex(bus_idx).to_numpy()
                 va[k] = net.res_bus.va_degree.reindex(bus_idx).to_numpy()
@@ -1030,6 +1055,10 @@ class Simulation:
                 ext_q[k] = net.res_ext_grid.q_mvar.sum()
             except pp.LoadflowNotConverged:
                 init = "auto"
+            if len(trafo_idx):
+                taps[k] = net.trafo.tap_pos.reindex(trafo_idx).to_numpy(dtype=float)
+            if len(sw_idx):
+                sw_closed[k] = net.switch.closed.reindex(sw_idx).to_numpy(dtype=bool)
 
         index = profile_table.index
         names = lambda tab, idx: list(self.net[tab].loc[idx, "name"]) if len(idx) else []
@@ -1040,6 +1069,7 @@ class Simulation:
         info = profile_table[["month", "hour_of_week"]].copy()
         info["converged"] = converged
         info["tap"] = tap_info
+        info["regler_iterationen"] = iterations
         self.results = diagrams.Results(
             info=info,
             vm_pu=pd.DataFrame(vm, index=index, columns=names("bus", bus_idx)),
@@ -1063,6 +1093,8 @@ class Simulation:
             ext_grid_p_mw=pd.DataFrame({"ext_grid_p_mw": ext_p}, index=index),
             load_p_mw=pd.DataFrame(p_load, index=index, columns=names("load", load_idx)),
             sgen_p_mw=pd.DataFrame(p_sgen, index=index, columns=names("sgen", sgen_idx)),
+            tap_pos=pd.DataFrame(taps, index=index, columns=names("trafo", trafo_idx)),
+            switch_closed=pd.DataFrame(sw_closed, index=index, columns=names("switch", sw_idx)),
         )
         self.meta["last_run"] = _now()
         self.meta["results_status"] = "aktuell"
