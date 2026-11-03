@@ -40,6 +40,8 @@ sim1 = sim.loadSimulation("cigre_basis")
 | `diagrams.py` | Klasse `Results` (Ergebnisse, Kennzahlen, Speichern/Laden) und alle Diagramme |
 | `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25, L25, P25, S25) und Wetter/PV/Wind (aus Task 2) |
 | `plots.py` | Zeitachse der Diagramme (6-h-Takt, Tageslinien, Datum) |
+| `lvnetz.py` | CIGRE-LV-Ortsnetz mit Grenzströmen, Anschluss an das MV-Netz, Kennwerte MS/NS (Task 4, Teil 2) |
+| `auslegung.py` | Spitzenwerte je Element und passende pandapower-Standardtrafos/-leitungen (Task 4, Teil 3) |
 | `szenarien.py` | Schalterstellungen S1–S3 (8 Zustände), statische Lastflüsse aller Zustände, Zeitreihen aller Zustände, Vergleichstabellen und Heatmaps (Task 4) |
 | `data/` | BDEW-Profile und Wetterwochen |
 | `simulations/` | gespeicherte Simulationen (wird automatisch angelegt) |
@@ -175,6 +177,9 @@ sim.ONLY_RUN_IF_CHANGED = True      # einmal am Anfang des Notebooks
 | `TRAFO_LOADING` | Trafoauslastung [%] | Trafos | 100 % |
 | `TRAFO_POWER` | Wirkleistung Trafo OS [MW] | Trafos | 0 |
 | `LINE_POWER` | Wirkleistung am Leitungsanfang [MW] (Vorzeichen = Richtung) | Leitungen | 0 |
+| `ACTIVE_POWER` | Wirkleistung je Element [MW] | beliebige Elemente: Leitungen, Trafos (OS), Busse (Entnahme), Lasten, Erzeuger, externes Netz | – |
+| `APPARENT_POWER` | Scheinleistung je Element [MVA] | wie `ACTIVE_POWER` | Bemessungsleistung von Trafos/Leitungen (gestrichelt) |
+| `CURRENT` | Strom je Element [A] (Trafos: US-Seite) | Leitungen, Trafos, Lasten, Erzeuger | Bemessungsstrom (gestrichelt) |
 | `ELEMENT_POWER` | Leistung von Lasten/Erzeugern [MW] | Lasten, Erzeuger | – |
 | `VOLTAGE_PROFILE` | Spannung entlang eines Pfades zu einem Zeitpunkt | Busse in Pfadreihenfolge | `v_min`, `v_max` |
 | `NETWORK` | Netzplan zu einem Zeitpunkt (Spannung und Auslastung farbig) | – (Zeitpunkt über `time`) | – |

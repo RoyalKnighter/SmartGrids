@@ -23,7 +23,12 @@ _PROFILE_LABEL = {"HAUSHALT": "Haushalt", "GEWERBE": "Gewerbe", "LANDWIRTSCHAFT"
                   "PV": "PV", "WIND": "Wind", "FEST": "konstant"}
 
 TABLES = ["vm_pu", "va_degree", "line_loading", "line_i_ka", "line_p_mw", "line_pl_mw",
-          "trafo_loading", "trafo_p_mw", "trafo_pl_mw", "ext_grid_p_mw", "load_p_mw", "sgen_p_mw"]
+          "trafo_loading", "trafo_p_mw", "trafo_pl_mw", "ext_grid_p_mw", "load_p_mw", "sgen_p_mw",
+          "line_q_mvar", "trafo_q_mvar", "trafo_i_hv_ka", "trafo_i_lv_ka", "bus_p_mw", "bus_q_mvar",
+          "ext_grid_q_mvar", "load_q_mvar", "sgen_q_mvar"]
+
+# Größen je Element für ACTIVE_POWER, APPARENT_POWER und CURRENT
+QUANTITY = {"P": ("Wirkleistung [MW]", "MW"), "S": ("Scheinleistung [MVA]", "MVA"), "I": ("Strom [A]", "A")}
 
 
 # ---------------------------------------------------------------------------
@@ -48,6 +53,57 @@ class Results:
     def element_p_mw(self):
         """Wirkleistung aller Lasten (Bezug) und Erzeuger (Einspeisung) [MW]."""
         return pd.concat([self.load_p_mw, self.sgen_p_mw], axis=1)
+
+    def quantity(self, net, kind):
+        """
+        Eine Größe für alle Elemente in einer Tabelle (Spalten = Elementnamen):
+            kind "P": Wirkleistung [MW], "S": Scheinleistung [MVA], "I": Strom [A]
+        Leitungen: Leitungsanfang (p_from, q_from), Strom = größerer Endstrom.
+        Trafos: OS-Seite für P und S; Strom auf der US-Seite (für die Auslegung des Ortsnetztrafos).
+        Busse: Leistung, die am Bus entnommen wird (> 0 Bezug, < 0 Einspeisung); kein Strom.
+        Lasten/Erzeuger: eingesetzte Leistung, Strom = S / (√3 · U_n · U_pu).
+        Externes Netz: Bezug (> 0) bzw. Rückspeisung (< 0).
+        """
+        def has(t):
+            return len(getattr(self, t).columns) > 0
+
+        parts = []
+        if kind == "P":
+            parts += [self.line_p_mw, self.trafo_p_mw, self.bus_p_mw, self.load_p_mw, self.sgen_p_mw]
+        elif kind == "S":
+            if has("line_q_mvar"):
+                parts.append(np.hypot(self.line_p_mw, self.line_q_mvar))
+            if has("trafo_q_mvar"):
+                parts.append(np.hypot(self.trafo_p_mw, self.trafo_q_mvar))
+            if has("bus_q_mvar"):
+                parts.append(np.hypot(self.bus_p_mw, self.bus_q_mvar))
+            if has("load_q_mvar"):
+                parts.append(np.hypot(self.load_p_mw, self.load_q_mvar))
+            if has("sgen_q_mvar") and has("sgen_p_mw"):
+                parts.append(np.hypot(self.sgen_p_mw, self.sgen_q_mvar))
+        elif kind == "I":
+            parts.append(self.line_i_ka * 1000)
+            if has("trafo_i_lv_ka"):
+                parts.append(self.trafo_i_lv_ka * 1000)
+            vn = net.bus.set_index("name")["vn_kv"]
+            for tab, p, q in (("load", self.load_p_mw, getattr(self, "load_q_mvar", None)),
+                              ("sgen", self.sgen_p_mw, getattr(self, "sgen_q_mvar", None))):
+                if q is None or not len(q.columns) or not len(p.columns):
+                    continue
+                bus_of = dict(zip(net[tab]["name"], net.bus.loc[net[tab]["bus"], "name"]))
+                cols = [c for c in p.columns if c in bus_of]
+                u = pd.DataFrame({c: self.vm_pu[bus_of[c]] * vn[bus_of[c]] for c in cols})
+                parts.append(np.hypot(p[cols], q[cols]) / (np.sqrt(3) * u) * 1000)
+        else:
+            raise ValueError('kind muss "P", "S" oder "I" sein.')
+        if kind in ("P", "S") and len(net.ext_grid):
+            ext_name = str(net.ext_grid["name"].iloc[0])
+            p = self.ext_grid_p_mw.iloc[:, 0]
+            if kind == "S" and has("ext_grid_q_mvar"):
+                p = np.hypot(p, self.ext_grid_q_mvar.iloc[:, 0])
+            parts.append(pd.DataFrame({ext_name: p}))
+        parts = [d for d in parts if d is not None and len(d.columns)]
+        return pd.concat(parts, axis=1) if parts else pd.DataFrame(index=self.info.index)
 
     def power_flow(self, net):
         """
@@ -197,6 +253,9 @@ def _source(results, diagram, net=None):
     """(Tabelle, y-Beschriftung, Grenzlinien, Elementart) für eine Diagrammart."""
     if diagram == Diagram.POWER_FLOW:
         return results.power_flow(net), "Wirkleistung [MW]", None, "Leistungsfluss"
+    kind = {Diagram.ACTIVE_POWER: "P", Diagram.APPARENT_POWER: "S", Diagram.CURRENT: "I"}.get(diagram)
+    if kind:
+        return results.quantity(net, kind), QUANTITY[kind][0], None, "Element"
     if diagram in (Diagram.VOLTAGE, Diagram.VOLTAGE_PROFILE):
         return results.vm_pu, "Spannung [pu]", None, "Bus"
     if diagram == Diagram.LINE_LOADING:
@@ -351,6 +410,8 @@ def create(sim, diagram, elements=None, months=None, layout="week", time=None, t
     figs = []
     markers = parse_markers(markers)
     label = title or f"{diagram.value} – Simulation '{sim.name}'"
+    if diagram in (Diagram.CURRENT, Diagram.APPARENT_POWER) and limits:
+        markers = markers + parse_markers(_rating_markers(sim.net, cols, diagram))
     if diagram == Diagram.POWER_FLOW and layout == "week":
         return _power_flow_weeks(sim, df, cols, months, label, markers, out_dir, show)
 
@@ -521,6 +582,36 @@ def _network(sim, months, time, title, labels, out_dir, show, show_elements=True
         _finish(fig, out_dir, f"NETWORK_{pd.Timestamp(ts):%Y%m%d_%H}.png", show)
         figs.append(fig)
     return figs
+
+
+def rating(net, name, kind):
+    """Bemessungswert eines Elements: kind "I" → Bemessungsstrom [A], "S" → Bemessungsleistung [MVA]."""
+    ln = net.line.index[net.line["name"] == name]
+    if len(ln):
+        r = net.line.loc[ln[0]]
+        i = r.max_i_ka * r.df * r.parallel * 1000
+        vn = net.bus.at[r.from_bus, "vn_kv"]
+        return i if kind == "I" else np.sqrt(3) * vn * i / 1000
+    tr = net.trafo.index[net.trafo["name"] == name]
+    if len(tr):
+        r = net.trafo.loc[tr[0]]
+        return r.sn_mva / (np.sqrt(3) * r.vn_lv_kv) * 1000 if kind == "I" else r.sn_mva
+    return None
+
+
+def _rating_markers(net, cols, diagram):
+    """Gestrichelte Linie beim Bemessungsstrom bzw. der Bemessungsleistung jeder gewählten Leitung/jedes Trafos."""
+    kind = "I" if diagram == Diagram.CURRENT else "S"
+    unit = "A" if kind == "I" else "MVA"
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    out = []
+    for i, c in enumerate(cols):
+        v = rating(net, c, kind)
+        if v is not None and not np.isnan(v):
+            label = f"{'I_r' if kind == 'I' else 'S_r'} {c} = {v:.0f} {unit}" if kind == "I" else \
+                    f"S_r {c} = {v:.3g} {unit}"
+            out.append((colors[i % len(colors)], float(v), label, "--"))
+    return out
 
 
 def _voltage_profile(sim, buses, time, title, limits, out_dir, show, markers=None):

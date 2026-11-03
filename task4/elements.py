@@ -56,6 +56,9 @@ class Diagram(Enum):
     VOLTAGE_PROFILE = "Spannungsverlauf entlang eines Pfades"
     POWER_FLOW = "Leistungsfluss"
     NETWORK = "Netzplan zu einem Zeitpunkt"
+    ACTIVE_POWER = "Wirkleistung"
+    APPARENT_POWER = "Scheinleistung"
+    CURRENT = "Strom"
 
 
 # ---------------------------------------------------------------------------

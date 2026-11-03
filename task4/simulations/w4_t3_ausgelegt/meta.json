@@ -1,0 +1,95 @@
+{
+  "name": "w4_t3_ausgelegt",
+  "meta": {
+    "created": "2026-11-03T12:15:49",
+    "modified": "2026-11-03T12:15:49",
+    "parent": "w4_lv_Bus12",
+    "last_run": "2026-11-03T12:17:00",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-03T12:15:49",
+      "aktion": "Parameter geändert",
+      "element": "LV Trafo R0-R1",
+      "tabelle": "trafo",
+      "parameter": "std_type",
+      "alt": null,
+      "neu": "0.63 MVA 20/0.4 kV"
+    },
+    {
+      "zeit": "2026-11-03T12:15:49",
+      "aktion": "Parameter geändert",
+      "element": "LV Trafo I0-I1",
+      "tabelle": "trafo",
+      "parameter": "std_type",
+      "alt": null,
+      "neu": "0.25 MVA 20/0.4 kV"
+    },
+    {
+      "zeit": "2026-11-03T12:15:49",
+      "aktion": "Parameter geändert",
+      "element": "LV Trafo C0-C1",
+      "tabelle": "trafo",
+      "parameter": "std_type",
+      "alt": null,
+      "neu": "0.4 MVA 20/0.4 kV"
+    },
+    {
+      "zeit": "2026-11-03T12:15:49",
+      "aktion": "Parameter geändert",
+      "element": "LV Line C1-C2",
+      "tabelle": "line",
+      "parameter": "std_type",
+      "alt": "OH1",
+      "neu": "94-AL1/15-ST1A 0.4"
+    },
+    {
+      "zeit": "2026-11-03T12:15:49",
+      "aktion": "Parameter geändert",
+      "element": "LV Line C2-C3",
+      "tabelle": "line",
+      "parameter": "std_type",
+      "alt": "OH1",
+      "neu": "94-AL1/15-ST1A 0.4"
+    }
+  ]
+}

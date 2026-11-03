@@ -68,7 +68,7 @@ IGNORE_COLUMNS = {"geo"}
 # werden die gespeicherten Ergebnisse geladen, statt neu zu rechnen. runSimulation(force=True)
 # rechnet immer.
 ONLY_RUN_IF_CHANGED = False
-CACHE_VERSION = "2"          # erhöhen, wenn sich Rechnung oder Ergebnisformat ändern
+CACHE_VERSION = "3"          # erhöhen, wenn sich Rechnung oder Ergebnisformat ändern
 FINGERPRINT_FILE = "fingerprint.txt"
 
 DEFAULT_SETTINGS = {
@@ -981,6 +981,13 @@ class Simulation:
         line_p = np.full((T, len(line_idx)), np.nan)
         line_pl = np.full((T, len(line_idx)), np.nan)
         trafo_pl = np.full((T, len(trafo_idx)), np.nan)
+        line_q = np.full((T, len(line_idx)), np.nan)
+        trafo_q = np.full((T, len(trafo_idx)), np.nan)
+        trafo_i_hv = np.full((T, len(trafo_idx)), np.nan)
+        trafo_i_lv = np.full((T, len(trafo_idx)), np.nan)
+        bus_p = np.full((T, len(bus_idx)), np.nan)
+        bus_q = np.full((T, len(bus_idx)), np.nan)
+        ext_q = np.full(T, np.nan)
         trafo_load = np.full((T, len(trafo_idx)), np.nan)
         trafo_p = np.full((T, len(trafo_idx)), np.nan)
         ext_p = np.full(T, np.nan)
@@ -1004,16 +1011,23 @@ class Simulation:
                 converged[k] = True
                 vm[k] = net.res_bus.vm_pu.reindex(bus_idx).to_numpy()
                 va[k] = net.res_bus.va_degree.reindex(bus_idx).to_numpy()
+                bus_p[k] = net.res_bus.p_mw.reindex(bus_idx).to_numpy()
+                bus_q[k] = net.res_bus.q_mvar.reindex(bus_idx).to_numpy()
                 if len(line_idx):
                     line_load[k] = net.res_line.loading_percent.reindex(line_idx).to_numpy()
                     line_i[k] = net.res_line.i_ka.reindex(line_idx).to_numpy()
                     line_p[k] = net.res_line.p_from_mw.reindex(line_idx).to_numpy()
                     line_pl[k] = net.res_line.pl_mw.reindex(line_idx).to_numpy()
+                    line_q[k] = net.res_line.q_from_mvar.reindex(line_idx).to_numpy()
                 if len(trafo_idx):
                     trafo_load[k] = net.res_trafo.loading_percent.reindex(trafo_idx).to_numpy()
                     trafo_p[k] = net.res_trafo.p_hv_mw.reindex(trafo_idx).to_numpy()
                     trafo_pl[k] = net.res_trafo.pl_mw.reindex(trafo_idx).to_numpy()
+                    trafo_q[k] = net.res_trafo.q_hv_mvar.reindex(trafo_idx).to_numpy()
+                    trafo_i_hv[k] = net.res_trafo.i_hv_ka.reindex(trafo_idx).to_numpy()
+                    trafo_i_lv[k] = net.res_trafo.i_lv_ka.reindex(trafo_idx).to_numpy()
                 ext_p[k] = net.res_ext_grid.p_mw.sum()
+                ext_q[k] = net.res_ext_grid.q_mvar.sum()
             except pp.LoadflowNotConverged:
                 init = "auto"
 
@@ -1035,6 +1049,15 @@ class Simulation:
             line_p_mw=pd.DataFrame(line_p, index=index, columns=names("line", line_idx)),
             line_pl_mw=pd.DataFrame(line_pl, index=index, columns=names("line", line_idx)),
             trafo_pl_mw=pd.DataFrame(trafo_pl, index=index, columns=names("trafo", trafo_idx)),
+            line_q_mvar=pd.DataFrame(line_q, index=index, columns=names("line", line_idx)),
+            trafo_q_mvar=pd.DataFrame(trafo_q, index=index, columns=names("trafo", trafo_idx)),
+            trafo_i_hv_ka=pd.DataFrame(trafo_i_hv, index=index, columns=names("trafo", trafo_idx)),
+            trafo_i_lv_ka=pd.DataFrame(trafo_i_lv, index=index, columns=names("trafo", trafo_idx)),
+            bus_p_mw=pd.DataFrame(bus_p, index=index, columns=names("bus", bus_idx)),
+            bus_q_mvar=pd.DataFrame(bus_q, index=index, columns=names("bus", bus_idx)),
+            ext_grid_q_mvar=pd.DataFrame({"ext_grid_q_mvar": ext_q}, index=index),
+            load_q_mvar=pd.DataFrame(q_load, index=index, columns=names("load", load_idx)),
+            sgen_q_mvar=pd.DataFrame(q_sgen, index=index, columns=names("sgen", sgen_idx)),
             trafo_loading=pd.DataFrame(trafo_load, index=index, columns=names("trafo", trafo_idx)),
             trafo_p_mw=pd.DataFrame(trafo_p, index=index, columns=names("trafo", trafo_idx)),
             ext_grid_p_mw=pd.DataFrame({"ext_grid_p_mw": ext_p}, index=index),
