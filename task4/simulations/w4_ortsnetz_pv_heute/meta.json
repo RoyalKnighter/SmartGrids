@@ -1,0 +1,212 @@
+{
+  "name": "w4_ortsnetz_pv_heute",
+  "meta": {
+    "created": "2026-11-04T15:05:53",
+    "modified": "2026-11-04T15:05:54",
+    "parent": "w4_t3_ausgelegt",
+    "last_run": "2026-11-04T15:07:03",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Parameter geändert",
+      "element": "LV Load R1",
+      "tabelle": "load",
+      "parameter": "p_mw",
+      "alt": 0.19,
+      "neu": 0.16150000000000003
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R1 PV",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R1 PV+Speicher",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Parameter geändert",
+      "element": "LV Load R11",
+      "tabelle": "load",
+      "parameter": "p_mw",
+      "alt": 0.01425,
+      "neu": 0.012112500000000002
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R11 PV",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R11 PV+Speicher",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Parameter geändert",
+      "element": "LV Load R15",
+      "tabelle": "load",
+      "parameter": "p_mw",
+      "alt": 0.0494,
+      "neu": 0.041990000000000006
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R15 PV",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R15 PV+Speicher",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Parameter geändert",
+      "element": "LV Load R16",
+      "tabelle": "load",
+      "parameter": "p_mw",
+      "alt": 0.05225,
+      "neu": 0.0444125
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R16 PV",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R16 PV+Speicher",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Parameter geändert",
+      "element": "LV Load R17",
+      "tabelle": "load",
+      "parameter": "p_mw",
+      "alt": 0.03325,
+      "neu": 0.028262500000000003
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R17 PV",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R17 PV+Speicher",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Parameter geändert",
+      "element": "LV Load R18",
+      "tabelle": "load",
+      "parameter": "p_mw",
+      "alt": 0.04465,
+      "neu": 0.03795250000000001
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R18 PV",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-04T15:05:54",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Load R18 PV+Speicher",
+      "tabelle": "load",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    }
+  ]
+}

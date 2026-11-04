@@ -1,0 +1,59 @@
+{
+  "name": "w4_pv_Bus10",
+  "meta": {
+    "created": "2026-11-04T14:53:02",
+    "modified": "2026-11-04T14:53:03",
+    "parent": "w4_t3_ausgelegt",
+    "last_run": "2026-11-04T14:55:12",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-04T14:53:03",
+      "aktion": "Element hinzugefügt",
+      "element": "PV-Freifläche",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    }
+  ]
+}

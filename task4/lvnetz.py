@@ -172,10 +172,20 @@ def kennwerte_sim(s):
     w, o = kennwerte(r.vm_pu[c], r.va_degree[c], r.line_loading[c], r.trafo_loading[c], s.net)
     g = bus_groups(s.net)
     vm = r.vm_pu[c]
+    alle = g["MS"] + g["NS"]
+    w["U max gesamt [pu]"] = vm[alle].max().max()
+    o["U max gesamt [pu]"] = vm[alle].max().idxmax()
     for lvl, cols in (("MS", g["MS"]), ("NS", g["NS"])):
         if cols:
             w[f"Stunden U < 0,90 {lvl}"] = int((vm[cols].min(axis=1) < 0.90).sum())
             w[f"Stunden U < 0,95 {lvl}"] = int((vm[cols].min(axis=1) < 0.95).sum())
+            w[f"Stunden U > 1,05 {lvl}"] = int((vm[cols].max(axis=1) > 1.05).sum())
+            w[f"Stunden U > 1,10 {lvl}"] = int((vm[cols].max(axis=1) > 1.10).sum())
+    ext = r.ext_grid_p_mw[c].iloc[:, 0]
+    w["Verluste [MWh]"] = float((r.line_pl_mw[c].sum(axis=1) + r.trafo_pl_mw[c].sum(axis=1)).sum()) \
+        if len(r.line_pl_mw.columns) else np.nan
+    w["Stunden Rückspeisung 110 kV"] = int((ext < 0).sum())
+    w["max. Rückspeisung 110 kV [MW]"] = max(0.0, -ext.min())
     e = element_groups(s.net)
     for label, cols, df in (("Leitung MS", e["line_MS"], r.line_loading), ("Leitung NS", e["line_NS"], r.line_loading),
                             ("Trafo HS/MS", e["trafo_HS"], r.trafo_loading), ("Ortsnetztrafo", e["trafo_NS"], r.trafo_loading)):
@@ -191,3 +201,37 @@ def kennwerte_static(net):
     row = lambda tab, col: pd.DataFrame([net[f"res_{tab}"][col].to_numpy()], columns=net[tab]["name"].to_numpy())
     return kennwerte(row("bus", "vm_pu"), row("bus", "va_degree"), row("line", "loading_percent"),
                      row("trafo", "loading_percent"), net)
+
+
+# ---------------------------------------------------------------------------
+# Haushalte mit PV bzw. PV und Speicher (Szenario 4.2)
+# ---------------------------------------------------------------------------
+
+def prosumer(s, anteil_pv, anteil_speicher, muster=r"^LV Load R"):
+    """
+    Haushaltslasten des Ortsnetzes aufteilen: Von jeder Haushaltslast (Name passt auf `muster`)
+    behält der Anteil 1 − anteil_pv − anteil_speicher das Profil H25, der Anteil anteil_pv wird als
+    eigene Last mit P25 (Haushalt mit PV, Netzbezug) und anteil_speicher als eigene Last mit S25
+    (Haushalt mit PV und Speicher, Netzbezug) angelegt.
+    Skalierung wie bisher über die Jahreshöchstleistung: Jede Teillast erhält den entsprechenden
+    Anteil der ursprünglichen Höchstleistung p_mw (die Winter-Abendspitze ändert sich durch PV kaum).
+    Rückgabe: Tabelle der Aufteilung.
+    """
+    from elements import Load, Profile
+    if anteil_pv < 0 or anteil_speicher < 0 or anteil_pv + anteil_speicher > 1:
+        raise ValueError("Anteile müssen zwischen 0 und 1 liegen und zusammen höchstens 1 ergeben.")
+    rows = []
+    loads = s.net.load[s.net.load["name"].str.contains(muster, regex=True) & (s.net.load["profile"] == "HAUSHALT")]
+    for idx, r in loads.iterrows():
+        p, bus = float(r.p_mw), s.net.bus.at[r.bus, "name"]
+        cos = float(r.cos_phi) if not pd.isna(r.cos_phi) else None
+        rest = 1 - anteil_pv - anteil_speicher
+        s.changeParameter(r["name"], "p_mw", p * rest)
+        if anteil_pv > 0:
+            s.createElement(Load(f"{r['name']} PV", bus=bus, profile=Profile.HAUSHALT_PV, p_mw=p * anteil_pv, cos_phi=cos))
+        if anteil_speicher > 0:
+            s.createElement(Load(f"{r['name']} PV+Speicher", bus=bus, profile=Profile.HAUSHALT_PV_SPEICHER,
+                                 p_mw=p * anteil_speicher, cos_phi=cos))
+        rows.append({"Last": r["name"], "Bus": bus, "p_mw vorher": p, "H25": p * rest,
+                     "P25": p * anteil_pv, "S25": p * anteil_speicher})
+    return pd.DataFrame(rows).set_index("Last")
