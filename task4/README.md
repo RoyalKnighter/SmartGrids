@@ -41,8 +41,8 @@ sim1 = sim.loadSimulation("cigre_basis")
 | `profiles.py`, `weather.py` | Lastprofile (BDEW H25, G25, L25, P25, S25) und Wetter/PV/Wind (aus Task 2) |
 | `plots.py` | Zeitachse der Diagramme (6-h-Takt, Tageslinien, Datum) |
 | `lvnetz.py` | CIGRE-LV-Ortsnetz mit Grenzströmen, Anschluss an das MV-Netz, Kennwerte MS/NS (Task 4, Teil 2) |
-| `regelung.py` | Regler für die Zeitreihe: `TapRegler` (regelbarer Ortsnetztrafo), `SchaltPlan` (Backup-Plan: Spannungsstützung mit Trennschaltern), `Wiederversorgung` (Backup-Plan: Trennstelle nach Ausfall schließen), `ausfall_analyse` und `wiederversorgungsplan` ((n-1)-Prüfung mit allen Schaltoptionen), `regle_statisch`, `schaltvorgaenge` (Task 4, Teil 3b) |
-| `bewertung.py` | Kennwerte, Ausschluss und Rangfolge von Anschlussvarianten nach einheitlichen Kriterien (Task 4, Teil 2 und 4) |
+| `regelung.py` | Regler für die Zeitreihe: `TapRegler` (regelbarer Ortsnetztrafo), `SchaltPlan` (Backup-Plan: Spannungsstützung mit Trennschaltern), `Wiederversorgung` (Backup-Plan: Trennstelle nach Ausfall schließen), `ausfall_analyse` und `wiederversorgungsplan` ((n-1)-Prüfung mit allen Schaltoptionen), `netz_zur_stunde` (statisches Netz aus einer Stunde der Zeitreihe), `kritische_stunden` (Jahreshöchstlast, max. Rückspeisung, max. Erzeugung), `standard_regler` (optional mit Wiederversorgungsplan), `regle_statisch`, `schaltvorgaenge` (Task 4, Teil 3b und 4) |
+| `bewertung.py` | Kennwerte, Ausschluss und Rangfolge von Anschlussvarianten nach einheitlichen Kriterien; `entscheidung` und `rang_mit_toleranz` für eine Rangfolge mit Relevanzschwellen (Task 4, Teil 2 und 4) |
 | `auslegung.py` | Spitzenwerte je Element und passende pandapower-Standardtrafos/-leitungen (Task 4, Teil 3) |
 | `szenarien.py` | Schalterstellungen S1–S3 (8 Zustände), statische Lastflüsse aller Zustände, Zeitreihen aller Zustände, Vergleichstabellen und Heatmaps (Task 4) |
 | `data/` | BDEW-Profile und Wetterwochen |

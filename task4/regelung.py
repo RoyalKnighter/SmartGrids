@@ -192,14 +192,15 @@ class Wiederversorgung:
         return geaendert
 
 
-def ausfall_analyse(net, ausfaelle, optionen, mv_busse, u_min=0.90, grenze=100.0):
+def ausfall_analyse(net, ausfaelle, optionen, mv_busse, u_min=0.90, u_max=1.10, grenze=100.0):
     """
     (n-1)-Prüfung: Jedes Betriebsmittel aus `ausfaelle` wird einzeln außer Betrieb genommen und für jede
     Schaltoption aus `optionen` (Tupel von Trennschaltern, () = keine Maßnahme) ein Lastfluss gerechnet.
 
     Rückgabe: DataFrame mit einer Zeile je (Ausfall, Maßnahme):
-      nicht versorgte Busse, niedrigste MS- und NS-Spannung, höchste Auslastung der MS-Leitungen und der
-      110/20-kV-Trafos und ob die Maßnahme zulässig ist (alle Busse versorgt, U ≥ u_min, Auslastung ≤ grenze).
+      nicht versorgte Busse, vom Netz getrennte Erzeugung, niedrigste und höchste MS-Spannung, niedrigste
+      NS-Spannung, höchste Auslastung der MS-Leitungen und der 110/20-kV-Trafos und ob die Maßnahme
+      zulässig ist (alle Busse versorgt, u_min ≤ U MS ≤ u_max, Auslastung ≤ grenze).
     """
     mv_idx = net.bus.index[net.bus["name"].isin(mv_busse)]
     mv_lines = net.line.index[net.line.from_bus.isin(mv_idx) & net.line.to_bus.isin(mv_idx)]
@@ -223,15 +224,19 @@ def ausfall_analyse(net, ausfaelle, optionen, mv_busse, u_min=0.90, grenze=100.0
             versorgt = n.bus.index[vm.notna()]
             ll = n.res_line.loading_percent.loc[mv_lines]
             ll = ll[n.line.loc[mv_lines, "in_service"]]
+            getrennt = n.sgen.in_service & n.sgen.bus.map(vm).isna()
             row.update({
                 "nicht versorgte Busse": int(vm.isna().sum()),
+                "getrennte Erzeugung [MW]": float(n.sgen.loc[getrennt, "p_mw"].sum()),
                 "U min MS [pu]": vm.loc[mv_idx].min(),
+                "U max MS [pu]": vm.loc[mv_idx].max(),
                 "U min NS [pu]": vm[n.bus.vn_kv < 1].min(),
                 "Leitung max MS [%]": ll.max(),
                 "am stärksten belastet": n.line.at[ll.idxmax(), "name"],
                 "Trafo max HS/MS [%]": n.res_trafo.loading_percent.loc[hs_trafos].max(),
             })
             row["zulässig"] = bool(row["nicht versorgte Busse"] == 0 and row["U min MS [pu]"] >= u_min
+                                   and row["U max MS [pu]"] <= u_max
                                    and row["Leitung max MS [%]"] <= grenze and row["Trafo max HS/MS [%]"] <= grenze)
             row["Bemerkung"] = ""
             rows.append(row)
@@ -249,6 +254,7 @@ def wiederversorgungsplan(analyse):
                      "ohne Maßnahme nicht versorgt": ohne["nicht versorgte Busse"],
                      "Maßnahme": wahl["Maßnahme"] if wahl is not None else "keine zulässige Maßnahme",
                      "U min MS [pu]": wahl["U min MS [pu]"] if wahl is not None else np.nan,
+                     "U max MS [pu]": wahl["U max MS [pu]"] if wahl is not None else np.nan,
                      "U min NS [pu]": wahl["U min NS [pu]"] if wahl is not None else np.nan,
                      "Leitung max MS [%]": wahl["Leitung max MS [%]"] if wahl is not None else np.nan,
                      "am stärksten belastet": wahl["am stärksten belastet"] if wahl is not None else "",
@@ -300,10 +306,12 @@ def schaltvorgaenge(s):
     return pd.Series(out)
 
 
-def standard_regler(net, u_min=0.95, u_max=1.05):
+def standard_regler(net, u_min=0.95, u_max=1.05, wiederversorgung=None):
     """
     Regler aus Teil 3b für ein Netz mit angeschlossenem CIGRE-LV-Ortsnetz:
     drei rONT-Regler (je Teilnetz R, I, C) und der Backup-Plan für das MV-Netz.
+    wiederversorgung: optional ein Wiederversorgungsplan {Betriebsmittel: [Trennschalter]}; dann kommt
+    die Wiederversorgung nach Ausfall dazu, und der SchaltPlan öffnet deren Schalter nicht.
     """
     import lvnetz
     g = lvnetz.bus_groups(net)
@@ -312,5 +320,43 @@ def standard_regler(net, u_min=0.95, u_max=1.05):
         trafo = f"LV Trafo {x}0-{x}1"
         if trafo in set(net.trafo["name"]):
             regler.append(TapRegler(trafo, [b for b in g["NS"] if b.startswith(f"LV Bus {x}")], u_min=u_min, u_max=u_max))
-    regler.append(SchaltPlan(g["MS"], [(["S2", "S3"], 0.94, 0.95), (["S1"], 0.92, 0.96)]))
+    wv = Wiederversorgung(wiederversorgung) if wiederversorgung else None
+    if wv:
+        regler.append(wv)
+    regler.append(SchaltPlan(g["MS"], [(["S2", "S3"], 0.94, 0.95), (["S1"], 0.92, 0.96)], wiederversorgung=wv))
     return regler
+
+
+def netz_zur_stunde(s, zeit):
+    """
+    Statisches Netz für eine Stunde einer gerechneten Simulation: Lasten und Erzeuger mit den Werten dieser
+    Stunde, Stufenstellungen und Schalterzustände wie in der Zeitreihe (also mit dem Zustand der Regelung).
+    """
+    r = s.results
+    net = copy.deepcopy(s.net)
+    for table, p, q in (("load", r.load_p_mw, r.load_q_mvar), ("sgen", r.sgen_p_mw, r.sgen_q_mvar)):
+        if len(net[table]) and len(p.columns):
+            net[table]["p_mw"] = net[table]["name"].map(p.loc[zeit]).fillna(0.0).to_numpy()
+            net[table]["q_mvar"] = net[table]["name"].map(q.loc[zeit]).fillna(0.0).to_numpy()
+    if len(r.tap_pos.columns):
+        tap = net.trafo["name"].map(r.tap_pos.loc[zeit])
+        net.trafo.loc[tap.notna(), "tap_pos"] = tap[tap.notna()].astype(int)
+    if len(r.switch_closed.columns):
+        sw = net.switch["name"].map(r.switch_closed.loc[zeit])
+        net.switch.loc[sw.notna(), "closed"] = sw[sw.notna()].astype(bool)
+    return net
+
+
+def kritische_stunden(s):
+    """
+    Betriebspunkte für die (n-1)-Prüfung aus einer Zeitreihe:
+      Jahreshöchstlast   – Stunde mit dem größten Bezug aus dem 110-kV-Netz
+      max. Rückspeisung  – Stunde mit der größten Rückspeisung ins 110-kV-Netz (bzw. dem kleinsten Bezug)
+      max. Erzeugung     – Stunde mit der größten Summe aller Erzeuger (nur wenn Erzeuger vorhanden)
+    """
+    p = s.results.ext_grid_p_mw.squeeze()
+    out = {"Jahreshöchstlast": p.idxmax(), "max. Rückspeisung": p.idxmin()}
+    g = s.results.sgen_p_mw
+    if len(g.columns) and g.sum(axis=1).max() > 0:
+        out["max. Erzeugung"] = g.sum(axis=1).idxmax()
+    return out

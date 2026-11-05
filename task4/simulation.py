@@ -881,7 +881,9 @@ class Simulation:
         unsupplied = top.unsupplied_buses(self.net)
         if unsupplied:
             names = [self._bus_name(b) for b in list(unsupplied)[:5]]
-            print(f"Hinweis: {len(unsupplied)} Busse sind nicht versorgt (z. B. {names}); ihre Ergebnisse sind NaN.")
+            anzahl = "1 Bus ist" if len(unsupplied) == 1 else f"{len(unsupplied)} Busse sind"
+            print(f"Hinweis: {anzahl} nicht versorgt (z. B. {names}); ihre Ergebnisse sind NaN. "
+                  "Bei einem Ausfall mit Wiederversorgung ist das der Zustand vor dem Schließen der Trennstelle.")
         if problems:
             raise RuntimeError("Simulation nicht möglich:\n- " + "\n- ".join(problems))
 

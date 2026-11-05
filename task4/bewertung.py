@@ -63,6 +63,45 @@ def ausschluss(werte):
 GENAUIGKEIT = {"[pu]": 3, "[%]": 1}
 
 
+def rang_mit_toleranz(werte, kleiner_besser=True, toleranz=0.0, relativ=False):
+    """
+    Ränge mit Relevanzschwelle: Werte, die sich vom besten Wert einer Gruppe um höchstens `toleranz`
+    unterscheiden (bei relativ=True: um höchstens toleranz · Wert), erhalten denselben Rang.
+    Beispiel (kleiner besser, Toleranz 1): 88,5 / 88,9 / 92,3 → Ränge 1 / 1 / 2.
+    """
+    s = werte.astype(float)
+    reihenfolge = s.sort_values(ascending=kleiner_besser).index
+    raenge, rang, start = {}, 0, None
+    for k in reihenfolge:
+        v = s[k]
+        grenze = toleranz * abs(start) if (relativ and start is not None) else toleranz
+        if start is None or abs(v - start) > grenze + 1e-12:
+            rang, start = rang + 1, v
+        raenge[k] = rang
+    return pd.Series(raenge).reindex(s.index)
+
+
+def entscheidung(werte, kriterien, verluste=None):
+    """
+    Entscheidungstabelle mit Relevanzschwellen.
+
+    kriterien: {Spalte: (kleiner_besser, toleranz, relativ)}
+    Je Kriterium werden Ränge mit Toleranz vergeben (rang_mit_toleranz); die Variante mit der kleinsten
+    Rangsumme gewinnt. Bei gleicher Rangsumme entscheiden die geringeren Verluste (Spalte `verluste`).
+    Rückgabe: (Tabelle, gewählte Variante)
+    """
+    tab = werte[list(kriterien)].astype(float).copy()
+    for k, (kb, tol, rel) in kriterien.items():
+        tab[f"Rang {k.split(' [')[0]}"] = rang_mit_toleranz(werte[k], kb, tol, rel)
+    tab["Rangsumme"] = tab.filter(like="Rang ").sum(axis=1).astype(int)
+    sortierung = ["Rangsumme"]
+    if verluste is not None:
+        tab["Verluste [MWh]"] = werte[verluste].astype(float).round(1)
+        sortierung.append("Verluste [MWh]")
+    tab = tab.sort_values(sortierung)
+    return tab, tab.index[0]
+
+
 def rangfolge(werte, kandidaten):
     """
     Rangtabelle der Kandidaten (1 = bester Wert je Kriterium) und gewählte Variante (kleinste Rangsumme).
