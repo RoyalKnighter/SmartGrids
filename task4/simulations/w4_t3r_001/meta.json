@@ -1,10 +1,10 @@
 {
   "name": "w4_t3r_001",
   "meta": {
-    "created": "2026-11-05T16:28:20",
-    "modified": "2026-11-05T16:28:21",
+    "created": "2026-11-08T23:14:04",
+    "modified": "2026-11-08T23:14:04",
     "parent": "w4_t3_ausgelegt",
-    "last_run": "2026-11-04T12:05:00",
+    "last_run": "2026-11-08T20:53:32",
     "results_status": "aktuell"
   },
   "settings": {
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-05T16:28:21",
+      "zeit": "2026-11-08T23:14:04",
       "aktion": "Parameter geändert",
       "element": "S3",
       "tabelle": "switch",

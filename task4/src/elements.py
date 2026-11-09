@@ -23,16 +23,13 @@ class Profile(Enum):
     HAUSHALT = "Haushalt (BDEW H25)"
     GEWERBE = "Gewerbe (BDEW G25)"
     LANDWIRTSCHAFT = "Landwirtschaft (BDEW L25)"
-    HAUSHALT_PV = "Haushalt mit PV, Netzbezug (BDEW P25)"
-    HAUSHALT_PV_SPEICHER = "Haushalt mit PV und Speicher, Netzbezug (BDEW S25)"
     PV = "Photovoltaik (Wetter, Trina Vertex S+)"
     WIND = "Wind (Wetter, Vestas V90-2.0 MW)"
     FEST = "konstante Leistung"
 
 
 # Lastprofile, die über einen Jahresverbrauch (annual_kwh) skaliert werden
-ENERGY_PROFILES = {Profile.HAUSHALT, Profile.GEWERBE, Profile.LANDWIRTSCHAFT,
-                   Profile.HAUSHALT_PV, Profile.HAUSHALT_PV_SPEICHER}
+ENERGY_PROFILES = {Profile.HAUSHALT, Profile.GEWERBE, Profile.LANDWIRTSCHAFT}
 ENERGY_PROFILE_NAMES = {p.name for p in ENERGY_PROFILES}
 
 # Welche Profile sind für welche Elementtabelle zulässig
@@ -41,7 +38,6 @@ SGEN_PROFILES = {Profile.PV, Profile.WIND, Profile.FEST}
 
 # Standard-Leistungsfaktoren
 DEFAULT_COS_PHI = {Profile.HAUSHALT: 0.97, Profile.GEWERBE: 0.95, Profile.LANDWIRTSCHAFT: 0.95,
-                   Profile.HAUSHALT_PV: 0.97, Profile.HAUSHALT_PV_SPEICHER: 0.97,
                    Profile.PV: 1.0, Profile.WIND: 1.0, Profile.FEST: None}
 
 
@@ -143,7 +139,7 @@ class Switch:
 class Load:
     """
     Last mit Profil.
-    HAUSHALT, GEWERBE, LANDWIRTSCHAFT, HAUSHALT_PV, HAUSHALT_PV_SPEICHER:
+    HAUSHALT, GEWERBE, LANDWIRTSCHAFT:
                       annual_kwh angeben, oder p_mw als Jahreshöchstleistung
                       (annual_kwh wird dann daraus berechnet)
     FEST:             p_mw (und q_mvar oder cos_phi)
@@ -164,6 +160,8 @@ class Generator:
     PV:   kwp (installierte Leistung), oder p_mw als Nennleistung
     WIND: p_mw = Nennleistung
     FEST: p_mw
+    cos_phi: Leistungsfaktor; positiv = übererregt (Blindleistungsabgabe), negativ = untererregt
+             (Blindleistungsaufnahme, z. B. −0.95), leer bzw. 1 = reine Wirkleistung
     """
     name: str
     bus: str
@@ -171,3 +169,26 @@ class Generator:
     kwp: Optional[float] = None
     p_mw: Optional[float] = None
     cos_phi: Optional[float] = None
+
+
+@dataclass
+class Storage:
+    """
+    Batteriespeicher (pandapower storage) mit Eigenverbrauchsregelung.
+    Der Speicher gehört zu einem Haushalt bzw. einer Gruppe von Haushalten: Er lädt mit dem Überschuss
+    des Erzeugers `pv` über den Bezug der Last `load` (Anteil `load_anteil`) und entlädt, um diesen
+    Bezug zu decken. Der Fahrplan wird vor dem Lastfluss je Stunde aus den Profilen berechnet
+    (die Regelung misst nur am Hausanschluss und kennt das Netz nicht).
+    e_kwh: nutzbare Kapazität, p_kw: maximale Lade-/Entladeleistung,
+    eta: Wirkungsgrad je Richtung (Laden bzw. Entladen), soc_start: Ladezustand zu Beginn jeder Woche (0 … 1).
+    Vorzeichen wie in pandapower: p_mw > 0 Laden (Bezug), p_mw < 0 Entladen (Abgabe).
+    """
+    name: str
+    bus: str
+    e_kwh: float
+    p_kw: float
+    pv: str
+    load: str
+    load_anteil: float = 1.0
+    eta: float = 0.95
+    soc_start: float = 0.0

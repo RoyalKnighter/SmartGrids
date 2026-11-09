@@ -34,7 +34,7 @@ import pandapower.toolbox as tb
 
 import diagrams
 import timeseries as tsm
-from elements import (Profile, Diagram, Bus, Line, Trafo, ExtGrid, Switch, Load, Generator,
+from elements import (Profile, Diagram, Bus, Line, Trafo, ExtGrid, Switch, Load, Generator, Storage,
                       LOAD_PROFILES, SGEN_PROFILES, DEFAULT_COS_PHI, ENERGY_PROFILES, ENERGY_PROFILE_NAMES)
 from profiles import Month
 
@@ -44,7 +44,7 @@ __all__ = ["init", "loadSimulation", "listSimulations", "deleteSimulation", "com
            "Simulation", "Profile", "Diagram", "Month",
            "Bus", "Line", "Trafo", "ExtGrid", "Switch", "Load", "Generator"]
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent   # task4 (Module in task4/src)
 SIM_DIR = BASE_DIR / "simulations"
 
 # Tabellen, deren Elemente über Namen angesprochen werden
@@ -443,7 +443,7 @@ class Simulation:
             df.at[idx, "cos_phi"] = np.nan
         else:
             df.at[idx, "cos_phi"] = float(cos_phi)
-            df.at[idx, "q_mvar"] = df.at[idx, "p_mw"] * np.tan(np.arccos(float(cos_phi)))
+            df.at[idx, "q_mvar"] = df.at[idx, "p_mw"] * np.sign(float(cos_phi)) * np.tan(np.arccos(abs(float(cos_phi))))
         if table == "load" and profile not in ENERGY_PROFILES:
             df.at[idx, "annual_kwh"] = np.nan
         if table == "sgen" and profile != Profile.PV:
@@ -589,6 +589,16 @@ class Simulation:
             self._apply_profile("sgen", idx, element.profile, kwp=element.kwp, p_mw=element.p_mw,
                                 cos_phi=element.cos_phi)
             table = "sgen"
+        elif isinstance(element, Storage):
+            for ref in (element.pv, element.load):
+                self._find(ref)                                          # Erzeuger und Last müssen existieren
+            idx = pp.create_storage(net, self._bus(element.bus), p_mw=0.0, max_e_mwh=element.e_kwh / 1000,
+                                    soc_percent=100 * element.soc_start, name=element.name,
+                                    max_p_mw=element.p_kw / 1000, min_p_mw=-element.p_kw / 1000)
+            for col, val in (("eta", element.eta), ("pv_sgen", element.pv), ("load_name", element.load),
+                             ("load_anteil", element.load_anteil), ("soc_start", element.soc_start)):
+                net.storage.at[idx, col] = val
+            table = "storage"
         else:
             raise TypeError(f"Unbekannter Elementtyp: {type(element).__name__}")
         self._record("Element hinzugefügt", element.name, table)
@@ -899,12 +909,38 @@ class Simulation:
         p = base * scale
         p[:, ~df["in_service"].to_numpy()] = 0.0
         cos_phi = df["cos_phi"].to_numpy(dtype=float)
-        tan_phi = np.tan(np.arccos(np.where(np.isnan(cos_phi), 1.0, cos_phi)))
+        c = np.where(np.isnan(cos_phi), 1.0, cos_phi)
+        tan_phi = np.sign(c) * np.tan(np.arccos(np.abs(c)))              # cos φ < 0: untererregt (q < 0 beim Erzeuger)
         q = p * tan_phi
         fixed_q = np.isnan(cos_phi)                                      # FEST ohne cos φ: q aus dem Netz
         if fixed_q.any():
             q[:, fixed_q] = df["q_mvar"].to_numpy()[fixed_q]
         return df.index.to_numpy(), p, q
+
+    def _storage_schedule(self, load_idx, p_load, sgen_idx, p_sgen, profile_table):
+        """
+        Fahrplan der Batteriespeicher (Eigenverbrauchsregelung, Zeitschritt 1 h).
+        Überschuss = PV − Last·Anteil: Laden mit min(Überschuss, P_max, (E_max − E)/η);
+        Defizit: Entladen mit min(Defizit, P_max, E·η). Jede typische Woche beginnt mit soc_start.
+        Rückgabe: (Indizes, P [MW] je Stunde (> 0 Laden), Ladezustand [%] am Ende jeder Stunde)
+        """
+        st = self.net.storage if "storage" in self.net else pd.DataFrame()
+        T = len(profile_table)
+        if not len(st):
+            return np.array([], dtype=int), np.zeros((T, 0)), np.zeros((T, 0))
+        load_pos = {n: i for i, n in enumerate(self.net.load.loc[load_idx, "name"])}
+        sgen_pos = {n: i for i, n in enumerate(self.net.sgen.loc[sgen_idx, "name"])}
+        week = profile_table["month"].to_numpy()
+        P = np.zeros((T, len(st)))
+        SOC = np.zeros((T, len(st)))
+        for j, (_, r) in enumerate(st.iterrows()):
+            if not r.in_service:
+                continue
+            last = p_load[:, load_pos[r.load_name]] * float(r.load_anteil)
+            pv = p_sgen[:, sgen_pos[r.pv_sgen]]
+            P[:, j], SOC[:, j] = tsm.eigenverbrauch(pv, last, float(r.max_e_mwh), float(r.max_p_mw),
+                                                    float(r.eta), float(r.soc_start), wochen=week)
+        return st.index.to_numpy(), P, SOC
 
     def _tap_schedule(self, tap):
         """{trafo_index: {Month-Name: tap}} aus der Einstellung."""
@@ -984,6 +1020,7 @@ class Simulation:
         net = copy.deepcopy(self.net)
         load_idx, p_load, q_load = self._element_matrices("load", profile_table)
         sgen_idx, p_sgen, q_sgen = self._element_matrices("sgen", profile_table)
+        sto_idx, p_sto, soc_sto = self._storage_schedule(load_idx, p_load, sgen_idx, p_sgen, profile_table)
 
         T = len(profile_table)
         bus_idx, line_idx, trafo_idx = net.bus.index, net.line.index, net.trafo.index
@@ -1022,6 +1059,8 @@ class Simulation:
             if len(sgen_idx):
                 net.sgen.loc[sgen_idx, "p_mw"] = p_sgen[k]
                 net.sgen.loc[sgen_idx, "q_mvar"] = q_sgen[k]
+            if len(sto_idx):
+                net.storage.loc[sto_idx, "p_mw"] = p_sto[k]
             for ti, plan in schedule.items():
                 net.trafo.at[ti, "tap_pos"] = plan[month_col[k]]
             try:
@@ -1095,6 +1134,8 @@ class Simulation:
             ext_grid_p_mw=pd.DataFrame({"ext_grid_p_mw": ext_p}, index=index),
             load_p_mw=pd.DataFrame(p_load, index=index, columns=names("load", load_idx)),
             sgen_p_mw=pd.DataFrame(p_sgen, index=index, columns=names("sgen", sgen_idx)),
+            storage_p_mw=pd.DataFrame(p_sto, index=index, columns=names("storage", sto_idx)),
+            storage_soc_percent=pd.DataFrame(soc_sto, index=index, columns=names("storage", sto_idx)),
             tap_pos=pd.DataFrame(taps, index=index, columns=names("trafo", trafo_idx)),
             switch_closed=pd.DataFrame(sw_closed, index=index, columns=names("switch", sw_idx)),
         )

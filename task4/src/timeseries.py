@@ -6,7 +6,6 @@ mit einer Spalte je Profil erzeugt. Die Werte sind normiert und werden in der Si
 der Skalierung des jeweiligen Elements multipliziert:
 
     HAUSHALT, GEWERBE, LANDWIRTSCHAFT,
-    HAUSHALT_PV, HAUSHALT_PV_SPEICHER:  MW je kWh Jahresverbrauch    → × annual_kwh
     PV:                 MW je kWp                    → × kwp
     WIND:               Leistung / Nennleistung      → × p_mw (Nennleistung)
     FEST:               1                            → × p_mw
@@ -23,13 +22,12 @@ import weather as wt
 from elements import Profile
 from profiles import Lastprofil, Month, DayType
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent   # task4 (Module in task4/src)
 DATA_DIR = BASE_DIR / "data"
 WEATHER_FILE = DATA_DIR / "weather_weeks_2025.csv"
 
 _LOAD_PROFILE = {Profile.HAUSHALT: Lastprofil.HAUSHALT, Profile.GEWERBE: Lastprofil.GEWERBE,
-                 Profile.LANDWIRTSCHAFT: Lastprofil.LANDWIRTSCHAFT, Profile.HAUSHALT_PV: Lastprofil.HAUSHALT_PV,
-                 Profile.HAUSHALT_PV_SPEICHER: Lastprofil.HAUSHALT_PV_SPEICHER}
+                 Profile.LANDWIRTSCHAFT: Lastprofil.LANDWIRTSCHAFT}
 
 
 @lru_cache(maxsize=1)
@@ -99,3 +97,33 @@ def annual_peak_mw_per_kwh(profile, year=2025):
 def annual_kwh_from_peak(profile, p_max_mw):
     """Jahresverbrauch [kWh/a], bei dem die höchste Stundenleistung des Profils p_max_mw beträgt."""
     return p_max_mw / annual_peak_mw_per_kwh(profile)
+
+
+def eigenverbrauch(pv, last, e_max, p_max, eta=0.95, soc_start=0.0, wochen=None):
+    """
+    Fahrplan eines Batteriespeichers mit Eigenverbrauchsregelung (Zeitschritt 1 h).
+    pv, last: Erzeugung und Verbrauch des Haushalts bzw. der Haushaltsgruppe je Stunde [MW]
+    e_max [MWh], p_max [MW], eta: Wirkungsgrad je Richtung, soc_start: Ladezustand zu Beginn (0 … 1)
+    wochen: optional eine Kennung je Stunde (z. B. Monat der typischen Woche); bei jedem Wechsel beginnt
+            der Speicher wieder mit soc_start (die typischen Wochen hängen zeitlich nicht zusammen).
+    Regel: Überschuss (pv > last) laden mit min(Überschuss, p_max, (e_max − E)/eta),
+           Defizit entladen mit min(Defizit, p_max, E·eta).
+    Rückgabe: (P [MW] je Stunde, > 0 Laden; Ladezustand [%] am Ende jeder Stunde)
+    """
+    pv, last = np.asarray(pv, dtype=float), np.asarray(last, dtype=float)
+    T = len(pv)
+    P, SOC = np.zeros(T), np.zeros(T)
+    e = e_max * soc_start
+    for k in range(T):
+        if wochen is not None and (k == 0 or wochen[k] != wochen[k - 1]):
+            e = e_max * soc_start
+        bilanz = pv[k] - last[k]
+        if bilanz > 0:
+            p = min(bilanz, p_max, (e_max - e) / eta)
+            e += p * eta
+        else:
+            p = -min(-bilanz, p_max, e * eta)
+            e += p / eta
+        P[k] = p
+        SOC[k] = 100 * e / e_max if e_max > 0 else 0.0
+    return P, SOC

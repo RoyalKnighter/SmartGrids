@@ -45,7 +45,7 @@ TIMEZONE = "Europe/Berlin"
 PV_TILT_DEG = 35          # Modulneigung (0° = waagerecht)
 PV_AZIMUTH_DEG = 0        # Ausrichtung (0° = Süd, -90° = Ost, 90° = West)
 
-DATA_DIR = Path("data")
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 # Gesetzliche Feiertage NRW 2025. Wochen mit Feiertag werden bei der Auswahl übersprungen,
 # weil die repräsentative Lastwoche fünf Werktage annimmt.

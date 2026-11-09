@@ -48,7 +48,6 @@ LOADING_CMAP.set_over("black")
 NO_RESULT = "lightgray"
 
 PROFILE_LABEL = {"HAUSHALT": "Haushalt", "GEWERBE": "Gewerbe", "LANDWIRTSCHAFT": "Landwirtschaft",
-                 "HAUSHALT_PV": "Haushalt mit PV", "HAUSHALT_PV_SPEICHER": "Haushalt mit PV + Speicher",
                  "PV": "PV", "WIND": "Wind", "FEST": "konstant"}
 SGEN_TYPE_LABEL = {"PV": "PV", "WP": "Wind", "Wind": "Wind"}
 

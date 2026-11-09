@@ -1,10 +1,10 @@
 {
   "name": "w4_baseline_111",
   "meta": {
-    "created": "2026-11-03T12:22:26",
-    "modified": "2026-11-03T12:22:27",
+    "created": "2026-11-08T23:11:23",
+    "modified": "2026-11-08T23:11:23",
     "parent": "w4_baseline",
-    "last_run": "2026-11-03T12:23:34",
+    "last_run": "2026-11-08T20:30:00",
     "results_status": "aktuell"
   },
   "settings": {
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-03T12:22:27",
+      "zeit": "2026-11-08T23:11:23",
       "aktion": "Parameter geändert",
       "element": "S1",
       "tabelle": "switch",
@@ -56,7 +56,7 @@
       "neu": true
     },
     {
-      "zeit": "2026-11-03T12:22:27",
+      "zeit": "2026-11-08T23:11:23",
       "aktion": "Parameter geändert",
       "element": "S2",
       "tabelle": "switch",
@@ -65,7 +65,7 @@
       "neu": true
     },
     {
-      "zeit": "2026-11-03T12:22:27",
+      "zeit": "2026-11-08T23:11:23",
       "aktion": "Parameter geändert",
       "element": "S3",
       "tabelle": "switch",

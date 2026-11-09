@@ -39,8 +39,6 @@ class Lastprofil(Enum):
     HAUSHALT = ("BDEW_H25_Haushalte.csv", "H25 – Haushalt")
     GEWERBE = ("BDEW_G25_Gewerbe.csv", "G25 – Gewerbe allgemein")
     LANDWIRTSCHAFT = ("BDEW_L25_Landwirtschaft.csv", "L25 – Landwirtschaft")
-    HAUSHALT_PV = ("BDEW_P25_PV.csv", "P25 – Haushalt mit PV (Netzbezug)")
-    HAUSHALT_PV_SPEICHER = ("BDEW_S25_PV_Speicher.csv", "S25 – Haushalt mit PV und Speicher (Netzbezug)")
 
     @property
     def filename(self):
@@ -141,7 +139,7 @@ def read_bdew_csv(path):
     return raw.astype(float)
 
 
-def load_profiles(data_dir="data", profiles=tuple(Lastprofil)):
+def load_profiles(data_dir=Path(__file__).resolve().parent.parent / "data", profiles=tuple(Lastprofil)):
     """
     Liest alle Profile einmal ein und gibt sie als Dictionary zurück:
         {Lastprofil.HAUSHALT: DataFrame, Lastprofil.GEWERBE: DataFrame, ...}
@@ -155,8 +153,8 @@ def load_profiles(data_dir="data", profiles=tuple(Lastprofil)):
 # ---------------------------------------------------------------------------
 
 # Profile, auf die die Dynamisierungsfunktion anzuwenden ist
-# (H25, P25, S25: ja; G25, L25: nein – laut Dateikopf und BDEW-Anwendungshilfe 2025)
-DYNAMIC_PROFILES = {Lastprofil.HAUSHALT, Lastprofil.HAUSHALT_PV, Lastprofil.HAUSHALT_PV_SPEICHER}
+# (H25: ja; G25, L25: nein – laut Dateikopf und BDEW-Anwendungshilfe 2025)
+DYNAMIC_PROFILES = {Lastprofil.HAUSHALT}
 
 
 def dynamization_factor(day_of_year):

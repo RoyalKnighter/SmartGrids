@@ -207,31 +207,47 @@ def kennwerte_static(net):
 # Haushalte mit PV bzw. PV und Speicher (Szenario 4.2)
 # ---------------------------------------------------------------------------
 
-def prosumer(s, anteil_pv, anteil_speicher, muster=r"^LV Load R"):
+# Kenngrößen eines Haushalts mit PV und Speicher (Quellen: siehe Datengrundlage, Abschnitt 1.6)
+KWH_JE_HAUSHALT = 3000.0       # Jahresverbrauch eines Haushalts [kWh/a]
+KWP_JE_HAUSHALT = 9.0          # PV-Leistung je Haushalt mit PV [kWp]
+SPEICHER_KWH = 8.3             # nutzbare Speicherkapazität je Heimspeicher [kWh]
+SPEICHER_KW_JE_KWH = 0.59      # Lade-/Entladeleistung je kWh Kapazität [kW/kWh]
+SPEICHER_ETA = 0.95            # Wirkungsgrad je Richtung (Laden bzw. Entladen)
+
+
+def prosumer(s, anteil_pv, anteil_speicher, muster=r"^LV Load R", kwh_je_haushalt=KWH_JE_HAUSHALT,
+             kwp=KWP_JE_HAUSHALT, e_kwh=SPEICHER_KWH, kw_je_kwh=SPEICHER_KW_JE_KWH, eta=SPEICHER_ETA):
     """
-    Haushaltslasten des Ortsnetzes aufteilen: Von jeder Haushaltslast (Name passt auf `muster`)
-    behält der Anteil 1 − anteil_pv − anteil_speicher das Profil H25, der Anteil anteil_pv wird als
-    eigene Last mit P25 (Haushalt mit PV, Netzbezug) und anteil_speicher als eigene Last mit S25
-    (Haushalt mit PV und Speicher, Netzbezug) angelegt.
-    Skalierung wie bisher über die Jahreshöchstleistung: Jede Teillast erhält den entsprechenden
-    Anteil der ursprünglichen Höchstleistung p_mw (die Winter-Abendspitze ändert sich durch PV kaum).
-    Rückgabe: Tabelle der Aufteilung.
+    Haushalte mit PV und Speicher im Ortsnetz ergänzen. Alle Haushaltslasten behalten das Profil H25
+    (Verbrauch); an jedem Bus mit einer Haushaltslast (Name passt auf `muster`) kommen hinzu:
+      - Erzeuger „… PV“: PV-Anlagen der Haushalte, die nur PV haben (Anteil anteil_pv),
+      - Erzeuger „… PV Speicher“ und Speicher „… Speicher“: PV-Anlagen und Heimspeicher der Haushalte
+        mit PV und Speicher (Anteil anteil_speicher). Der Speicher lädt mit deren PV-Überschuss und deckt
+        deren Bezug (Eigenverbrauchsregelung, siehe elements.Storage).
+    Zahl der Haushalte je Last = Jahresverbrauch / kwh_je_haushalt.
+    Rückgabe: Tabelle mit Haushalten, PV-Leistung und Speichergröße je Last.
     """
-    from elements import Load, Profile
+    from elements import Generator, Storage, Profile
     if anteil_pv < 0 or anteil_speicher < 0 or anteil_pv + anteil_speicher > 1:
         raise ValueError("Anteile müssen zwischen 0 und 1 liegen und zusammen höchstens 1 ergeben.")
     rows = []
     loads = s.net.load[s.net.load["name"].str.contains(muster, regex=True) & (s.net.load["profile"] == "HAUSHALT")]
-    for idx, r in loads.iterrows():
-        p, bus = float(r.p_mw), s.net.bus.at[r.bus, "name"]
-        cos = float(r.cos_phi) if not pd.isna(r.cos_phi) else None
-        rest = 1 - anteil_pv - anteil_speicher
-        s.changeParameter(r["name"], "p_mw", p * rest)
-        if anteil_pv > 0:
-            s.createElement(Load(f"{r['name']} PV", bus=bus, profile=Profile.HAUSHALT_PV, p_mw=p * anteil_pv, cos_phi=cos))
-        if anteil_speicher > 0:
-            s.createElement(Load(f"{r['name']} PV+Speicher", bus=bus, profile=Profile.HAUSHALT_PV_SPEICHER,
-                                 p_mw=p * anteil_speicher, cos_phi=cos))
-        rows.append({"Last": r["name"], "Bus": bus, "p_mw vorher": p, "H25": p * rest,
-                     "P25": p * anteil_pv, "S25": p * anteil_speicher})
-    return pd.DataFrame(rows).set_index("Last")
+    for _, r in loads.iterrows():
+        bus = s.net.bus.at[r.bus, "name"]
+        kurz = r["name"].replace("LV Load ", "")
+        haushalte = float(r.annual_kwh) / kwh_je_haushalt
+        n_pv, n_sp = haushalte * anteil_pv, haushalte * anteil_speicher
+        if n_pv > 0:
+            s.createElement(Generator(f"LV PV {kurz}", bus=bus, profile=Profile.PV, kwp=n_pv * kwp))
+        if n_sp > 0:
+            s.createElement(Generator(f"LV PV Speicher {kurz}", bus=bus, profile=Profile.PV, kwp=n_sp * kwp))
+            s.createElement(Storage(f"LV Speicher {kurz}", bus=bus, e_kwh=n_sp * e_kwh, p_kw=n_sp * e_kwh * kw_je_kwh,
+                                    pv=f"LV PV Speicher {kurz}", load=r["name"], load_anteil=anteil_speicher, eta=eta))
+        rows.append({"Last": r["name"], "Bus": bus, "Jahresverbrauch [MWh]": r.annual_kwh / 1000,
+                     "Haushalte": haushalte, "davon nur PV": n_pv, "davon PV + Speicher": n_sp,
+                     "PV [kWp]": (n_pv + n_sp) * kwp, "Speicher [kWh]": n_sp * e_kwh,
+                     "Speicherleistung [kW]": n_sp * e_kwh * kw_je_kwh})
+    tab = pd.DataFrame(rows).set_index("Last")
+    tab.loc["Summe"] = tab.sum(numeric_only=True)
+    tab.loc["Summe", "Bus"] = ""
+    return tab

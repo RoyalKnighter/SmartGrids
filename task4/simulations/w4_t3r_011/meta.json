@@ -1,10 +1,10 @@
 {
   "name": "w4_t3r_011",
   "meta": {
-    "created": "2026-11-05T16:28:26",
-    "modified": "2026-11-05T16:28:26",
+    "created": "2026-11-08T23:14:05",
+    "modified": "2026-11-08T23:14:05",
     "parent": "w4_t3_ausgelegt",
-    "last_run": "2026-11-04T12:08:11",
+    "last_run": "2026-11-08T20:57:01",
     "results_status": "aktuell"
   },
   "settings": {
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-05T16:28:26",
+      "zeit": "2026-11-08T23:14:05",
       "aktion": "Parameter geändert",
       "element": "S2",
       "tabelle": "switch",
@@ -56,7 +56,7 @@
       "neu": true
     },
     {
-      "zeit": "2026-11-05T16:28:26",
+      "zeit": "2026-11-08T23:14:05",
       "aktion": "Parameter geändert",
       "element": "S3",
       "tabelle": "switch",

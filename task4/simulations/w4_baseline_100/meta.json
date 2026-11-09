@@ -1,10 +1,10 @@
 {
   "name": "w4_baseline_100",
   "meta": {
-    "created": "2026-11-03T12:18:59",
-    "modified": "2026-11-03T12:18:59",
+    "created": "2026-11-08T23:11:22",
+    "modified": "2026-11-08T23:11:22",
     "parent": "w4_baseline",
-    "last_run": "2026-11-03T12:20:07",
+    "last_run": "2026-11-08T20:27:01",
     "results_status": "aktuell"
   },
   "settings": {
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-03T12:18:59",
+      "zeit": "2026-11-08T23:11:22",
       "aktion": "Parameter geändert",
       "element": "S1",
       "tabelle": "switch",
