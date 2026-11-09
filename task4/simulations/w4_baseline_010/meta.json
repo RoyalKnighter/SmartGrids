@@ -1,8 +1,8 @@
 {
   "name": "w4_baseline_010",
   "meta": {
-    "created": "2026-11-08T23:11:21",
-    "modified": "2026-11-08T23:11:21",
+    "created": "2026-11-09T21:57:26",
+    "modified": "2026-11-09T21:57:26",
     "parent": "w4_baseline",
     "last_run": "2026-11-08T20:24:27",
     "results_status": "aktuell"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-08T23:11:21",
+      "zeit": "2026-11-09T21:57:26",
       "aktion": "Parameter geändert",
       "element": "S2",
       "tabelle": "switch",

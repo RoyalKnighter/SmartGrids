@@ -1,8 +1,8 @@
 {
   "name": "w4_t3c_ausfall_2_3",
   "meta": {
-    "created": "2026-11-08T23:14:25",
-    "modified": "2026-11-08T23:14:25",
+    "created": "2026-11-09T22:02:28",
+    "modified": "2026-11-09T22:02:28",
     "parent": "w4_t3_ausgelegt",
     "last_run": "2026-11-08T21:04:50",
     "results_status": "aktuell"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-08T23:14:25",
+      "zeit": "2026-11-09T22:02:28",
       "aktion": "Parameter geändert",
       "element": "Line 2-3",
       "tabelle": "line",

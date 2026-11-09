@@ -1,8 +1,8 @@
 {
   "name": "w4_kombi_W12_P1",
   "meta": {
-    "created": "2026-11-08T23:15:04",
-    "modified": "2026-11-08T23:15:04",
+    "created": "2026-11-09T22:03:22",
+    "modified": "2026-11-09T22:03:22",
     "parent": "w4_t3_ausgelegt",
     "last_run": "2026-11-08T21:48:11",
     "results_status": "aktuell"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-08T23:15:04",
+      "zeit": "2026-11-09T22:03:22",
       "aktion": "Element hinzugefügt",
       "element": "Windpark",
       "tabelle": "sgen",
@@ -56,7 +56,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-08T23:15:04",
+      "zeit": "2026-11-09T22:03:22",
       "aktion": "Element hinzugefügt",
       "element": "PV-Freifläche",
       "tabelle": "sgen",

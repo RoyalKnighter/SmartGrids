@@ -1,8 +1,8 @@
 {
   "name": "w4_wind_Bus10",
   "meta": {
-    "created": "2026-11-08T23:14:45",
-    "modified": "2026-11-08T23:14:45",
+    "created": "2026-11-09T22:02:56",
+    "modified": "2026-11-09T22:02:56",
     "parent": "w4_t3_ausgelegt",
     "last_run": "2026-11-08T21:22:46",
     "results_status": "aktuell"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-08T23:14:45",
+      "zeit": "2026-11-09T22:02:56",
       "aktion": "Element hinzugefügt",
       "element": "Windpark",
       "tabelle": "sgen",

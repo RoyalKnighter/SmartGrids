@@ -1,8 +1,8 @@
 {
   "name": "w4_t3_ausgelegt",
   "meta": {
-    "created": "2026-11-08T23:12:47",
-    "modified": "2026-11-08T23:12:47",
+    "created": "2026-11-09T22:00:05",
+    "modified": "2026-11-09T22:00:05",
     "parent": "w4_lv_Bus12",
     "last_run": "2026-11-08T20:39:43",
     "results_status": "aktuell"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-08T23:12:47",
+      "zeit": "2026-11-09T22:00:05",
       "aktion": "Parameter geändert",
       "element": "LV Trafo R0-R1",
       "tabelle": "trafo",
@@ -56,7 +56,7 @@
       "neu": "0.63 MVA 20/0.4 kV"
     },
     {
-      "zeit": "2026-11-08T23:12:47",
+      "zeit": "2026-11-09T22:00:05",
       "aktion": "Parameter geändert",
       "element": "LV Trafo I0-I1",
       "tabelle": "trafo",
@@ -65,7 +65,7 @@
       "neu": "0.25 MVA 20/0.4 kV"
     },
     {
-      "zeit": "2026-11-08T23:12:47",
+      "zeit": "2026-11-09T22:00:05",
       "aktion": "Parameter geändert",
       "element": "LV Trafo C0-C1",
       "tabelle": "trafo",
@@ -74,7 +74,7 @@
       "neu": "0.4 MVA 20/0.4 kV"
     },
     {
-      "zeit": "2026-11-08T23:12:47",
+      "zeit": "2026-11-09T22:00:05",
       "aktion": "Parameter geändert",
       "element": "LV Line C1-C2",
       "tabelle": "line",
@@ -83,7 +83,7 @@
       "neu": "94-AL1/15-ST1A 0.4"
     },
     {
-      "zeit": "2026-11-08T23:12:47",
+      "zeit": "2026-11-09T22:00:05",
       "aktion": "Parameter geändert",
       "element": "LV Line C2-C3",
       "tabelle": "line",

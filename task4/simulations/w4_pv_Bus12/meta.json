@@ -1,8 +1,8 @@
 {
   "name": "w4_pv_Bus12",
   "meta": {
-    "created": "2026-11-08T23:14:58",
-    "modified": "2026-11-08T23:14:58",
+    "created": "2026-11-09T22:03:15",
+    "modified": "2026-11-09T22:03:15",
     "parent": "w4_t3_ausgelegt",
     "last_run": "2026-11-08T21:42:06",
     "results_status": "aktuell"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-08T23:14:58",
+      "zeit": "2026-11-09T22:03:15",
       "aktion": "Element hinzugefügt",
       "element": "PV-Freifläche",
       "tabelle": "sgen",
