@@ -1,0 +1,77 @@
+{
+  "name": "w4_t5_trafoausfall_3",
+  "meta": {
+    "created": "2026-11-09T22:07:53",
+    "modified": "2026-11-09T22:07:53",
+    "parent": "w4_t5_basis",
+    "last_run": "2026-11-08T23:33:00",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-09T22:07:53",
+      "aktion": "Parameter geändert",
+      "element": "Trafo 0-1",
+      "tabelle": "trafo",
+      "parameter": "in_service",
+      "alt": true,
+      "neu": false
+    },
+    {
+      "zeit": "2026-11-09T22:07:53",
+      "aktion": "Parameter geändert",
+      "element": "S1",
+      "tabelle": "switch",
+      "parameter": "closed",
+      "alt": false,
+      "neu": true
+    },
+    {
+      "zeit": "2026-11-09T22:07:53",
+      "aktion": "Parameter geändert",
+      "element": "Windpark",
+      "tabelle": "sgen",
+      "parameter": "in_service",
+      "alt": true,
+      "neu": false
+    }
+  ]
+}

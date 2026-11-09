@@ -1,0 +1,59 @@
+{
+  "name": "w4_n1_W12_P1_L12_13",
+  "meta": {
+    "created": "2026-11-09T22:04:49",
+    "modified": "2026-11-09T22:04:50",
+    "parent": "w4_kombi_W12_P1",
+    "last_run": "2026-11-08T21:58:18",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-09T22:04:50",
+      "aktion": "Parameter geändert",
+      "element": "Line 12-13",
+      "tabelle": "line",
+      "parameter": "in_service",
+      "alt": true,
+      "neu": false
+    }
+  ]
+}

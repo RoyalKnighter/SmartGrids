@@ -1,0 +1,212 @@
+{
+  "name": "w4_t4b_ortsnetz_heute",
+  "meta": {
+    "created": "2026-11-09T22:05:36",
+    "modified": "2026-11-09T22:05:37",
+    "parent": "w4_t3_ausgelegt",
+    "last_run": "2026-11-08T22:13:31",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV R1",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV Speicher R1",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Speicher R1",
+      "tabelle": "storage",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV R11",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV Speicher R11",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Speicher R11",
+      "tabelle": "storage",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV R15",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV Speicher R15",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Speicher R15",
+      "tabelle": "storage",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV R16",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV Speicher R16",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Speicher R16",
+      "tabelle": "storage",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV R17",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV Speicher R17",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Speicher R17",
+      "tabelle": "storage",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV R18",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV PV Speicher R18",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    },
+    {
+      "zeit": "2026-11-09T22:05:37",
+      "aktion": "Element hinzugefügt",
+      "element": "LV Speicher R18",
+      "tabelle": "storage",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    }
+  ]
+}
