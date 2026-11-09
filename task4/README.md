@@ -2,6 +2,11 @@
 
 Bearbeitung des Arbeitsauftrags W4 (`W4_Arbeitsauftrag.ipynb`), Modul Smart Grids, TH Köln.
 
+## Hinweis
+Da die Abgabe mit den ausgeführten Simulationen zu groß wäre sind diese incht enthalten in der abgabe.
+Wenn die Notebooks aber ausgeführt werden, werden aber alle Simulationen durchlaufen, welches aber länger dauert.
+Die aktuelle version inklusive ausgeführten Simulationen: https://github.com/RoyalKnighter/SmartGrids
+
 ## Ordner
 
 | Ordner | Inhalt |
@@ -37,3 +42,7 @@ Ein vollständiger Durchlauf aller Zeitreihen dauert mehrere Stunden. Danach lie
 ## Voraussetzungen
 
 Python 3.10 oder neuer mit `pandapower` (3.x), `numpy`, `pandas`, `matplotlib`, `networkx`, `jupyter`.
+
+---
+
+Dies ist die arbeit von Tinus

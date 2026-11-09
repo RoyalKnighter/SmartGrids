@@ -1,4 +1,4 @@
-# Task 3 – Simulationssoftware
+# Smart Grids - Simulationssoftware
 
 `simulation.py` ist eine kleine Simulationsumgebung auf Basis von pandapower. Damit lassen sich Netze mit Last- und Erzeugungsprofilen über die 12 typischen Wochen des Jahres simulieren. Simulationen lassen sich einfach ändern, speichern, laden, kopieren, vergleichen und auswerten.
 
