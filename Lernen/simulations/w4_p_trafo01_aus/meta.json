@@ -1,0 +1,81 @@
+{
+  "name": "w4_p_trafo01_aus",
+  "meta": {
+    "created": "2026-11-16T10:47:05",
+    "modified": "2026-11-16T10:47:05",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:47:13",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:47:05",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JANUARY"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:47:05",
+      "aktion": "Parameter geändert",
+      "element": "Trafo 0-1",
+      "tabelle": "trafo",
+      "parameter": "in_service",
+      "alt": true,
+      "neu": false
+    },
+    {
+      "zeit": "2026-11-16T10:47:05",
+      "aktion": "Parameter geändert",
+      "element": "S1",
+      "tabelle": "switch",
+      "parameter": "closed",
+      "alt": false,
+      "neu": true
+    }
+  ]
+}

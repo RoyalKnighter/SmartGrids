@@ -1,0 +1,63 @@
+{
+  "name": "w4_p_ohne_ront_jul",
+  "meta": {
+    "created": "2026-11-16T10:47:28",
+    "modified": "2026-11-16T10:47:28",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:47:34",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JULY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:47:28",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JULY"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "name": "w4_p_bus8_2",
+  "meta": {
+    "created": "2026-11-16T10:48:03",
+    "modified": "2026-11-16T10:48:03",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:48:08",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JULY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:48:03",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JULY"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:48:03",
+      "aktion": "Element hinzugefügt",
+      "element": "Einspeisung Bus 8",
+      "tabelle": "sgen",
+      "parameter": null,
+      "alt": null,
+      "neu": null
+    }
+  ]
+}

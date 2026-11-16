@@ -1,0 +1,95 @@
+{
+  "name": "w4_p_last_plus30",
+  "meta": {
+    "created": "2026-11-16T10:44:57",
+    "modified": "2026-11-16T10:44:57",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:45:05",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JANUARY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null,
+    "profile_edits": [
+      {
+        "name": "+30 %",
+        "elemente": "^LV Load R",
+        "art": "faktor",
+        "wert": 1.3,
+        "zeit": {
+          "typ": "immer",
+          "monate": null
+        }
+      }
+    ]
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:44:57",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JANUARY"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:44:57",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "profile_edits",
+      "alt": null,
+      "neu": [
+        {
+          "name": "+30 %",
+          "elemente": "^LV Load R",
+          "art": "faktor",
+          "wert": 1.3,
+          "zeit": {
+            "typ": "immer",
+            "monate": null
+          }
+        }
+      ]
+    }
+  ]
+}

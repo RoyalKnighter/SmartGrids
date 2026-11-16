@@ -1,0 +1,101 @@
+{
+  "name": "w4_p_starkwind_30",
+  "meta": {
+    "created": "2026-11-16T10:45:54",
+    "modified": "2026-11-16T10:45:54",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:46:01",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JUNE"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null,
+    "profile_edits": [
+      {
+        "name": "nachts volle Leistung",
+        "elemente": "^Windpark$",
+        "art": "wert_mw",
+        "wert": 30.0,
+        "zeit": {
+          "typ": "periodisch",
+          "alle_h": 24,
+          "start_h": 0,
+          "dauer_h": 6,
+          "monate": null
+        }
+      }
+    ]
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:45:54",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JUNE"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:45:54",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "profile_edits",
+      "alt": null,
+      "neu": [
+        {
+          "name": "nachts volle Leistung",
+          "elemente": "^Windpark$",
+          "art": "wert_mw",
+          "wert": 30.0,
+          "zeit": {
+            "typ": "periodisch",
+            "alle_h": 24,
+            "start_h": 0,
+            "dauer_h": 6,
+            "monate": null
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "name": "w4_p_wolkenzug",
+  "meta": {
+    "created": "2026-11-16T10:44:46",
+    "modified": "2026-11-16T10:44:46",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:44:53",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JULY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null,
+    "profile_edits": [
+      {
+        "name": "Wolkenzug",
+        "elemente": "^PV-Freifläche$|^LV PV",
+        "art": "faktor",
+        "wert": 0.3,
+        "zeit": {
+          "typ": "periodisch",
+          "alle_h": 2,
+          "start_h": 1,
+          "dauer_h": 1,
+          "monate": null
+        }
+      }
+    ]
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:44:46",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JULY"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:44:46",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "profile_edits",
+      "alt": null,
+      "neu": [
+        {
+          "name": "Wolkenzug",
+          "elemente": "^PV-Freifläche$|^LV PV",
+          "art": "faktor",
+          "wert": 0.3,
+          "zeit": {
+            "typ": "periodisch",
+            "alle_h": 2,
+            "start_h": 1,
+            "dauer_h": 1,
+            "monate": null
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "name": "w4_p_sonntag_zukunft",
+  "meta": {
+    "created": "2026-11-16T10:46:33",
+    "modified": "2026-11-16T10:46:33",
+    "parent": "w4_p_basis_zukunft",
+    "last_run": "2026-11-16T10:46:39",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JULY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null,
+    "profile_edits": [
+      {
+        "name": "Sonntag 60 % Last",
+        "elemente": "^LV Load R",
+        "art": "faktor",
+        "wert": 0.6,
+        "zeit": {
+          "typ": "einmal",
+          "datum": null,
+          "monat": "JULY",
+          "wochentag": 6,
+          "von": 0,
+          "bis": 24
+        }
+      }
+    ]
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:46:33",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JULY"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:46:33",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "profile_edits",
+      "alt": null,
+      "neu": [
+        {
+          "name": "Sonntag 60 % Last",
+          "elemente": "^LV Load R",
+          "art": "faktor",
+          "wert": 0.6,
+          "zeit": {
+            "typ": "einmal",
+            "datum": null,
+            "monat": "JULY",
+            "wochentag": 6,
+            "von": 0,
+            "bis": 24
+          }
+        }
+      ]
+    }
+  ]
+}

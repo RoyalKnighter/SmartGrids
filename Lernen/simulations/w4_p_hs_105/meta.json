@@ -1,0 +1,72 @@
+{
+  "name": "w4_p_hs_105",
+  "meta": {
+    "created": "2026-11-16T10:47:54",
+    "modified": "2026-11-16T10:47:54",
+    "parent": "w4_p_basis",
+    "last_run": "2026-11-16T10:48:00",
+    "results_status": "aktuell"
+  },
+  "settings": {
+    "months": [
+      "JULY"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "baseline_settings": {
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
+    "v_min": 0.9,
+    "v_max": 1.1,
+    "tap": null
+  },
+  "log": [
+    {
+      "zeit": "2026-11-16T10:47:54",
+      "aktion": "Einstellung geändert",
+      "element": null,
+      "tabelle": "settings",
+      "parameter": "months",
+      "alt": [
+        "JANUARY",
+        "FEBRUARY",
+        "MARCH",
+        "APRIL",
+        "MAY",
+        "JUNE",
+        "JULY",
+        "AUGUST",
+        "SEPTEMBER",
+        "OCTOBER",
+        "NOVEMBER",
+        "DECEMBER"
+      ],
+      "neu": [
+        "JULY"
+      ]
+    },
+    {
+      "zeit": "2026-11-16T10:47:54",
+      "aktion": "Parameter geändert",
+      "element": "ext_grid_0",
+      "tabelle": "ext_grid",
+      "parameter": "vm_pu",
+      "alt": 1.03,
+      "neu": 1.05
+    }
+  ]
+}
