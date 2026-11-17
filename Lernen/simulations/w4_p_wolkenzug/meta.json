@@ -1,8 +1,8 @@
 {
   "name": "w4_p_wolkenzug",
   "meta": {
-    "created": "2026-11-16T10:44:46",
-    "modified": "2026-11-16T10:44:46",
+    "created": "2026-11-17T14:39:01",
+    "modified": "2026-11-17T14:39:01",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:44:53",
     "results_status": "aktuell"
@@ -51,7 +51,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:44:46",
+      "zeit": "2026-11-17T14:39:01",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:44:46",
+      "zeit": "2026-11-17T14:39:01",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

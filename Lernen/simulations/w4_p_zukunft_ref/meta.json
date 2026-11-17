@@ -1,8 +1,8 @@
 {
   "name": "w4_p_zukunft_ref",
   "meta": {
-    "created": "2026-11-16T10:46:25",
-    "modified": "2026-11-16T10:46:25",
+    "created": "2026-11-17T14:39:48",
+    "modified": "2026-11-17T14:39:48",
     "parent": "w4_p_basis_zukunft",
     "last_run": "2026-11-16T10:46:32",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:46:25",
+      "zeit": "2026-11-17T14:39:48",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

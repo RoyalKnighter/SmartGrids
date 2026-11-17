@@ -1,8 +1,8 @@
 {
   "name": "w4_p_starkwind_30",
   "meta": {
-    "created": "2026-11-16T10:45:54",
-    "modified": "2026-11-16T10:45:54",
+    "created": "2026-11-17T14:39:30",
+    "modified": "2026-11-17T14:39:31",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:46:01",
     "results_status": "aktuell"
@@ -51,7 +51,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:45:54",
+      "zeit": "2026-11-17T14:39:31",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:45:54",
+      "zeit": "2026-11-17T14:39:31",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

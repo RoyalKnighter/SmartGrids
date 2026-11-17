@@ -1,8 +1,8 @@
 {
   "name": "w4_p_hs_100",
   "meta": {
-    "created": "2026-11-16T10:47:46",
-    "modified": "2026-11-16T10:47:46",
+    "created": "2026-11-17T14:40:47",
+    "modified": "2026-11-17T14:40:47",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:47:54",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:47:46",
+      "zeit": "2026-11-17T14:40:47",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:47:46",
+      "zeit": "2026-11-17T14:40:47",
       "aktion": "Parameter geändert",
       "element": "ext_grid_0",
       "tabelle": "ext_grid",

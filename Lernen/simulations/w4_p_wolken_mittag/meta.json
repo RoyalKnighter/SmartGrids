@@ -1,8 +1,8 @@
 {
   "name": "w4_p_wolken_mittag",
   "meta": {
-    "created": "2026-11-16T10:44:39",
-    "modified": "2026-11-16T10:44:39",
+    "created": "2026-11-17T14:38:59",
+    "modified": "2026-11-17T14:38:59",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:44:45",
     "results_status": "aktuell"
@@ -52,7 +52,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:44:39",
+      "zeit": "2026-11-17T14:38:59",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -76,7 +76,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:44:39",
+      "zeit": "2026-11-17T14:38:59",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

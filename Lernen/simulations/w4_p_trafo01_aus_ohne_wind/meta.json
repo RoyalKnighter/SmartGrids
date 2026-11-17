@@ -1,8 +1,8 @@
 {
   "name": "w4_p_trafo01_aus_ohne_wind",
   "meta": {
-    "created": "2026-11-16T10:47:14",
-    "modified": "2026-11-16T10:47:14",
+    "created": "2026-11-17T14:40:20",
+    "modified": "2026-11-17T14:40:20",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:47:20",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:47:14",
+      "zeit": "2026-11-17T14:40:20",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:47:14",
+      "zeit": "2026-11-17T14:40:20",
       "aktion": "Parameter geändert",
       "element": "Trafo 0-1",
       "tabelle": "trafo",
@@ -69,7 +69,7 @@
       "neu": false
     },
     {
-      "zeit": "2026-11-16T10:47:14",
+      "zeit": "2026-11-17T14:40:20",
       "aktion": "Parameter geändert",
       "element": "S1",
       "tabelle": "switch",
@@ -78,7 +78,7 @@
       "neu": true
     },
     {
-      "zeit": "2026-11-16T10:47:14",
+      "zeit": "2026-11-17T14:40:20",
       "aktion": "Parameter geändert",
       "element": "Windpark",
       "tabelle": "sgen",

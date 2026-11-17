@@ -1,8 +1,8 @@
 {
   "name": "w4_p_basis_zukunft",
   "meta": {
-    "created": "2026-11-16T10:46:19",
-    "modified": "2026-11-16T10:46:19",
+    "created": "2026-11-17T14:39:45",
+    "modified": "2026-11-17T14:39:46",
     "parent": "w4_kombi_W1_P12",
     "last_run": null,
     "results_status": "keine"
@@ -47,7 +47,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV R1",
       "tabelle": "sgen",
@@ -56,7 +56,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV Speicher R1",
       "tabelle": "sgen",
@@ -65,7 +65,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV Speicher R1",
       "tabelle": "storage",
@@ -74,7 +74,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV R11",
       "tabelle": "sgen",
@@ -83,7 +83,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV Speicher R11",
       "tabelle": "sgen",
@@ -92,7 +92,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV Speicher R11",
       "tabelle": "storage",
@@ -101,7 +101,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV R15",
       "tabelle": "sgen",
@@ -110,7 +110,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV Speicher R15",
       "tabelle": "sgen",
@@ -119,7 +119,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV Speicher R15",
       "tabelle": "storage",
@@ -128,7 +128,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV R16",
       "tabelle": "sgen",
@@ -137,7 +137,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV Speicher R16",
       "tabelle": "sgen",
@@ -146,7 +146,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV Speicher R16",
       "tabelle": "storage",
@@ -155,7 +155,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV R17",
       "tabelle": "sgen",
@@ -164,7 +164,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:45",
       "aktion": "Element hinzugefügt",
       "element": "LV PV Speicher R17",
       "tabelle": "sgen",
@@ -173,7 +173,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:46",
       "aktion": "Element hinzugefügt",
       "element": "LV Speicher R17",
       "tabelle": "storage",
@@ -182,7 +182,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:46",
       "aktion": "Element hinzugefügt",
       "element": "LV PV R18",
       "tabelle": "sgen",
@@ -191,7 +191,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:46",
       "aktion": "Element hinzugefügt",
       "element": "LV PV Speicher R18",
       "tabelle": "sgen",
@@ -200,7 +200,7 @@
       "neu": null
     },
     {
-      "zeit": "2026-11-16T10:46:19",
+      "zeit": "2026-11-17T14:39:46",
       "aktion": "Element hinzugefügt",
       "element": "LV Speicher R18",
       "tabelle": "storage",

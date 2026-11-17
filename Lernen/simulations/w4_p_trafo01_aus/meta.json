@@ -1,8 +1,8 @@
 {
   "name": "w4_p_trafo01_aus",
   "meta": {
-    "created": "2026-11-16T10:47:05",
-    "modified": "2026-11-16T10:47:05",
+    "created": "2026-11-17T14:40:19",
+    "modified": "2026-11-17T14:40:19",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:47:13",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:47:05",
+      "zeit": "2026-11-17T14:40:19",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:47:05",
+      "zeit": "2026-11-17T14:40:19",
       "aktion": "Parameter geändert",
       "element": "Trafo 0-1",
       "tabelle": "trafo",
@@ -69,7 +69,7 @@
       "neu": false
     },
     {
-      "zeit": "2026-11-16T10:47:05",
+      "zeit": "2026-11-17T14:40:19",
       "aktion": "Parameter geändert",
       "element": "S1",
       "tabelle": "switch",

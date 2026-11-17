@@ -1,8 +1,8 @@
 {
   "name": "w4_p_wind_cosphi",
   "meta": {
-    "created": "2026-11-16T10:47:37",
-    "modified": "2026-11-16T10:47:37",
+    "created": "2026-11-17T14:40:42",
+    "modified": "2026-11-17T14:40:42",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:47:44",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:47:37",
+      "zeit": "2026-11-17T14:40:42",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:47:37",
+      "zeit": "2026-11-17T14:40:42",
       "aktion": "Parameter geändert",
       "element": "Windpark",
       "tabelle": "sgen",

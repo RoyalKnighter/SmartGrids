@@ -1,8 +1,8 @@
 {
   "name": "w4_p_flaute_30",
   "meta": {
-    "created": "2026-11-16T10:45:36",
-    "modified": "2026-11-16T10:45:36",
+    "created": "2026-11-17T14:39:19",
+    "modified": "2026-11-17T14:39:22",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:45:43",
     "results_status": "aktuell"
@@ -58,7 +58,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:45:36",
+      "zeit": "2026-11-17T14:39:22",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:45:36",
+      "zeit": "2026-11-17T14:39:22",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

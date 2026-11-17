@@ -1,8 +1,8 @@
 {
   "name": "w4_p_speicher_doppelt",
   "meta": {
-    "created": "2026-11-16T10:48:33",
-    "modified": "2026-11-16T10:48:33",
+    "created": "2026-11-17T14:41:08",
+    "modified": "2026-11-17T14:41:08",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:48:39",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:48:33",
+      "zeit": "2026-11-17T14:41:08",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

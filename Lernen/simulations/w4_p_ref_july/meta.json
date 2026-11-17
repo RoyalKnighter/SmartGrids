@@ -1,8 +1,8 @@
 {
   "name": "w4_p_ref_july",
   "meta": {
-    "created": "2026-11-16T10:44:19",
-    "modified": "2026-11-16T10:44:19",
+    "created": "2026-11-17T14:38:53",
+    "modified": "2026-11-17T14:38:54",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:44:26",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:44:19",
+      "zeit": "2026-11-17T14:38:54",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

@@ -1,8 +1,8 @@
 {
   "name": "w4_p_last_plus60",
   "meta": {
-    "created": "2026-11-16T10:45:13",
-    "modified": "2026-11-16T10:45:13",
+    "created": "2026-11-17T14:39:11",
+    "modified": "2026-11-17T14:39:11",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:45:21",
     "results_status": "aktuell"
@@ -48,7 +48,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-16T10:45:13",
+      "zeit": "2026-11-17T14:39:11",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -72,7 +72,7 @@
       ]
     },
     {
-      "zeit": "2026-11-16T10:45:13",
+      "zeit": "2026-11-17T14:39:11",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
