@@ -1,8 +1,8 @@
 {
   "name": "w4_p_ohne_ront_jul",
   "meta": {
-    "created": "2026-11-17T14:40:28",
-    "modified": "2026-11-17T14:40:29",
+    "created": "2026-11-17T15:51:27",
+    "modified": "2026-11-17T15:51:27",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:47:34",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-17T14:40:29",
+      "zeit": "2026-11-17T15:51:27",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

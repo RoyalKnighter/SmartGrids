@@ -38,3 +38,10 @@ Ein vollständiger Durchlauf aller Zeitreihen dauert mehrere Stunden. Danach lie
 ## Voraussetzungen
 
 Python 3.10 oder neuer mit `pandapower` (3.x), `numpy`, `pandas`, `matplotlib`, `networkx`, `jupyter`.
+
+## Lernen
+
+| Notebook | Inhalt |
+|---|---|
+| `Pruefungsszenarien.ipynb` | Szenarien für die Prüfung mit Spannungsprofilen von Bus zu Bus (Werkzeug zum Bearbeiten von Profilen) |
+| `Live_Lastfluss.ipynb` | Live-Lastfluss mit Reglern für jede Last, jeden Erzeuger und jeden Speicher; eigene Lasten und Erzeuger an jedem Bus (benötigt `ipywidgets`) |

@@ -1,8 +1,8 @@
 {
   "name": "w4_p_last_abend60",
   "meta": {
-    "created": "2026-11-17T14:39:09",
-    "modified": "2026-11-17T14:39:10",
+    "created": "2026-11-17T15:50:20",
+    "modified": "2026-11-17T15:50:20",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:45:13",
     "results_status": "aktuell"
@@ -51,7 +51,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-17T14:39:10",
+      "zeit": "2026-11-17T15:50:20",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "zeit": "2026-11-17T14:39:10",
+      "zeit": "2026-11-17T15:50:20",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

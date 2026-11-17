@@ -1,8 +1,8 @@
 {
   "name": "w4_p_bus8_4",
   "meta": {
-    "created": "2026-11-17T14:40:59",
-    "modified": "2026-11-17T14:40:59",
+    "created": "2026-11-17T15:51:45",
+    "modified": "2026-11-17T15:51:46",
     "parent": "w4_p_basis",
     "last_run": "2026-11-16T10:48:14",
     "results_status": "aktuell"
@@ -36,7 +36,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-17T14:40:59",
+      "zeit": "2026-11-17T15:51:46",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "zeit": "2026-11-17T14:40:59",
+      "zeit": "2026-11-17T15:51:46",
       "aktion": "Element hinzugefügt",
       "element": "Einspeisung Bus 8",
       "tabelle": "sgen",

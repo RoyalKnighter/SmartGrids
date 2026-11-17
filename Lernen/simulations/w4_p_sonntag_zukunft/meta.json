@@ -1,8 +1,8 @@
 {
   "name": "w4_p_sonntag_zukunft",
   "meta": {
-    "created": "2026-11-17T14:39:49",
-    "modified": "2026-11-17T14:39:49",
+    "created": "2026-11-17T15:50:58",
+    "modified": "2026-11-17T15:50:58",
     "parent": "w4_p_basis_zukunft",
     "last_run": "2026-11-16T10:46:39",
     "results_status": "aktuell"
@@ -52,7 +52,7 @@
   },
   "log": [
     {
-      "zeit": "2026-11-17T14:39:49",
+      "zeit": "2026-11-17T15:50:58",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",
@@ -76,7 +76,7 @@
       ]
     },
     {
-      "zeit": "2026-11-17T14:39:49",
+      "zeit": "2026-11-17T15:50:58",
       "aktion": "Einstellung geändert",
       "element": null,
       "tabelle": "settings",

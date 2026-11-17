@@ -237,7 +237,7 @@ def kette(s, ende, start="Bus 0"):
     """
     import networkx as nx
     import pandapower.topology as top
-    net = s.net
+    net = getattr(s, "net", s)                                   # Simulation oder pandapower-Netz
     g = top.create_nxgraph(net, include_trafos=True, respect_switches=True)
     idx = dict(zip(net.bus["name"], net.bus.index))
     pfad = nx.shortest_path(g, idx[start], idx[ende])
